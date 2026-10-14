@@ -104,7 +104,6 @@ body{
   font-family:var(--font-ui);transition:.2s;
 }
 .nav-link:hover,.nav-link.active{background:var(--accent);color:#fff}
-.nav-link.wiki-tab{color:#e8c9a0}
 .user-area{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .btn-icon{
   background:transparent;border:1px solid rgba(255,255,255,.3);
@@ -267,7 +266,6 @@ body{
   margin-bottom:16px;
 }
 
-/* FemWiki tab */
 .wiki-panel{
   background:var(--card);border:1.5px solid var(--border);
   border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);
@@ -509,7 +507,6 @@ body{
         <a href="#moderacao" class="nav-link" data-nav="moderacao" id="nav-moderacao" style="display:none">Moderação</a>
         <a href="#perfil" class="nav-link" data-nav="perfil">Perfil</a>
         <a href="#config" class="nav-link" data-nav="config">Config</a>
-        <a href="#femwiki" class="nav-link wiki-tab" data-nav="femwiki">FemWiki</a>
       </nav>
       <div class="user-area" id="user-area">
         <button class="btn-icon" id="theme-toggle" title="Tema">🌙</button>
@@ -533,7 +530,6 @@ body{
       <a href="#moderacao" class="nav-link" data-nav="moderacao" id="nav-moderacao-m" style="display:none">🛡️ · Moderação</a>
       <a href="#perfil" class="nav-link" data-nav="perfil">👤 · Perfil</a>
       <a href="#config" class="nav-link" data-nav="config">⚙️ · Config</a>
-      <a href="#femwiki" class="nav-link" data-nav="femwiki">📚 · FemWiki</a>
     </nav>
     <div class="nav-drawer-footer">✦ CatWeb ✦</div>
   </aside>
@@ -548,8 +544,7 @@ body{
           <h1>Cat Web</h1>
           <h2>Feed em construção</h2>
           <p>A rede social está sendo preparada.</p>
-          <p>Feed, notificações e chat chegam nos próximos passos.</p>
-          <p class="hint">A aba <strong>FemWiki</strong> permanece disponível enquanto o CatWeb evolui.</p>
+          <p class="hint">Feed, notificações e chat chegam nos próximos passos.</p>
         </div>
       </div>
     </div>
@@ -749,24 +744,11 @@ body{
       </div>
     </div>
 
-
-    <!-- FEMWIKI (pausada) -->
-    <div id="view-femwiki" class="view">
-      <div class="container">
-        <div class="wiki-panel">
-          <span class="badge-paused">Em pausa</span>
-          <h2 style="margin-top:14px">FemWiki</h2>
-          <p>O catálogo de personagens femininos continua guardado neste projeto.</p>
-          <p>Enquanto o <em>CatWeb</em> toma forma, a wiki fica nesta aba — sem apagar o que já foi feito.</p>
-          <p style="font-size:.95rem;margin-top:16px;color:var(--muted)">Quando decidir o destino da FemWiki (integrar, separar ou arquivar), ajustamos juntos.</p>
-        </div>
-      </div>
-    </div>
   </main>
 
   <footer class="footer">
     <strong>Cat Web</strong>
-    <div style="margin-top:6px">Rede social · FemWiki na aba ao lado</div>
+    <div style="margin-top:6px">O criador desse site pensa na ex</div>
   </footer>
 
   <!-- Auth Modal -->
@@ -2051,7 +2033,7 @@ function router(){
   const raw=location.hash.slice(1)||"feed";
   const [page,param]=raw.split("/");
   if(page==="user"&&param){ showView("user"); renderPublicProfile(param); return; }
-  const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config","femwiki"];
+  const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config"];
   if(pages.includes(page)){
     showView(page);
     if(page==="perfil") renderProfile();
