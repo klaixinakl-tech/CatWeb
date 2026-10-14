@@ -209,6 +209,119 @@ body{
 }
 .modal-ban textarea{min-height:80px;resize:vertical}
 
+/* Chat */
+[data-theme="light"]{
+  --chat-mine-bg:#fffcf7;
+  --chat-mine-fg:#1a1210;
+  --chat-mine-border:#8b1e2d;
+  --chat-theirs-bg:#8b1e2d;
+  --chat-theirs-fg:#fff;
+  --chat-theirs-border:#f4efe6;
+}
+[data-theme="dark"]{
+  --chat-mine-bg:#0c0c0c;
+  --chat-mine-fg:#f0e6d8;
+  --chat-mine-border:#e07080;
+  --chat-theirs-bg:#e07080;
+  --chat-theirs-fg:#1a1010;
+  --chat-theirs-border:#0c0c0c;
+}
+.chat-shell{
+  max-width:720px;margin:0 auto;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+  display:flex;flex-direction:column;min-height:min(72vh,620px);
+}
+.chat-layout{display:flex;flex:1;min-height:0}
+.chat-list-pane{
+  width:100%;border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;
+}
+.chat-list-pane.hidden-mobile{display:none}
+.chat-thread-pane{
+  display:none;flex-direction:column;flex:1;min-width:0;min-height:0;width:100%;
+}
+.chat-thread-pane.open{display:flex}
+.chat-list-head,.chat-thread-head{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;background:var(--bg-alt);
+}
+.chat-list-head h2,.chat-thread-head h2{
+  margin:0;font-family:var(--font-ui);font-size:1rem;font-weight:700;color:var(--ink);
+}
+.chat-back{
+  background:none;border:none;color:var(--accent);font-size:1.2rem;cursor:pointer;
+  padding:4px 8px;font-family:var(--font-ui);
+}
+.chat-friend-row{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;
+  border-bottom:1px solid var(--border);transition:background .12s;
+}
+.chat-friend-row:hover,.chat-friend-row.active{background:var(--bg-alt)}
+.chat-friend-row .cf-av{
+  width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);font-weight:700;font-size:.9rem;
+}
+.chat-friend-row .cf-av img{width:100%;height:100%;object-fit:cover}
+.chat-friend-row .cf-meta{flex:1;min-width:0}
+.chat-friend-row .cf-name{font-family:var(--font-ui);font-weight:600;font-size:.92rem;color:var(--ink)}
+.chat-friend-row .cf-preview{
+  font-family:var(--font-ui);font-size:.78rem;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;
+}
+.chat-empty{
+  padding:28px 16px;text-align:center;color:var(--muted);font-family:var(--font-ui);font-size:.9rem;
+}
+.chat-msgs{
+  flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px;
+  background:var(--bg);
+}
+.chat-bubble-row{display:flex;width:100%}
+.chat-bubble-row.mine{justify-content:flex-end}
+.chat-bubble-row.theirs{justify-content:flex-start}
+.chat-bubble{
+  max-width:78%;padding:8px 12px;border-radius:14px;font-family:var(--font-ui);
+  font-size:.92rem;line-height:1.35;word-break:break-word;border:1.5px solid transparent;
+}
+.chat-bubble.mine{
+  background:var(--chat-mine-bg);color:var(--chat-mine-fg);
+  border-color:var(--chat-mine-border);border-bottom-right-radius:4px;
+}
+.chat-bubble.theirs{
+  background:var(--chat-theirs-bg);color:var(--chat-theirs-fg);
+  border-color:var(--chat-theirs-border);border-bottom-left-radius:4px;
+}
+.chat-bubble .chat-time{
+  display:block;margin-top:4px;font-size:.68rem;opacity:.7;text-align:right;
+  font-family:var(--font-ui);
+}
+.chat-compose{
+  display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);
+  background:var(--card);align-items:flex-end;
+}
+.chat-compose textarea{
+  flex:1;min-height:42px;max-height:120px;resize:none;padding:10px 12px;
+  border-radius:12px;border:1.5px solid var(--border);background:var(--bg);
+  color:var(--ink);font-family:var(--font-ui);font-size:.92rem;line-height:1.3;
+}
+.chat-compose textarea:focus{outline:none;border-color:var(--accent)}
+.chat-compose .chat-send{
+  background:var(--accent);color:#fff;border:none;border-radius:12px;
+  padding:10px 14px;font-family:var(--font-ui);font-weight:600;cursor:pointer;
+  font-size:.88rem;white-space:nowrap;
+}
+.chat-compose .chat-send:disabled{opacity:.5;cursor:not-allowed}
+.chat-char{
+  font-family:var(--font-ui);font-size:.7rem;color:var(--muted);text-align:right;
+  padding:0 14px 8px;background:var(--card);
+}
+@media(min-width:720px){
+  .chat-list-pane{width:38%;display:flex!important}
+  .chat-list-pane.hidden-mobile{display:flex!important}
+  .chat-thread-pane{display:flex}
+  .chat-back{display:none}
+}
+
+
 
 
 /* Views */
@@ -550,16 +663,40 @@ body{
     </div>
 
     <!-- CHAT -->
-    <div id="view-chat" class="view">
+        <div id="view-chat" class="view">
       <div class="container">
-        <div class="placeholder-card">
+        <div id="chat-guest" class="placeholder-card">
           <h2>Chat</h2>
-          <p>Conversas em tempo real — em construção.</p>
+          <p>Faça login para conversar com seus amigos.</p>
+          <button class="btn btn-primary" id="btn-chat-login" style="margin-top:14px">Entrar</button>
+        </div>
+        <div id="chat-app" class="chat-shell hidden">
+          <div class="chat-layout">
+            <div class="chat-list-pane" id="chat-list-pane">
+              <div class="chat-list-head"><h2>💬 Conversas</h2></div>
+              <div id="chat-friends-list" style="overflow-y:auto;flex:1"></div>
+            </div>
+            <div class="chat-thread-pane" id="chat-thread-pane">
+              <div class="chat-thread-head">
+                <button type="button" class="chat-back" id="chat-back" aria-label="Voltar">←</button>
+                <div class="cf-av" id="chat-peer-av" style="width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-ui);font-weight:700;font-size:.8rem;overflow:hidden;flex-shrink:0">?</div>
+                <h2 id="chat-peer-name">Selecione um amigo</h2>
+              </div>
+              <div class="chat-msgs" id="chat-msgs">
+                <div class="chat-empty" id="chat-msgs-empty">Escolha um amigo na lista para começar.</div>
+              </div>
+              <div class="chat-char"><span id="chat-char-count">0</span>/1000</div>
+              <form class="chat-compose" id="chat-form">
+                <textarea id="chat-input" maxlength="1000" rows="1" placeholder="Mensagem..." disabled></textarea>
+                <button type="submit" class="chat-send" id="chat-send" disabled>Enviar</button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- CORREIO -->
+<!-- CORREIO -->
     <div id="view-correio" class="view">
       <div class="container">
         <div class="placeholder-card" style="text-align:left">
@@ -1780,7 +1917,10 @@ async function renderPublicProfile(uid){
 
     let actions="";
     if(currentUser&&!isSelf){
-      if(isFriend) actions+=`<button class="btn btn-secondary btn-sm" id="pub-unfriend">Remover amigo</button>`;
+      if(isFriend) {
+        actions+=`<button class="btn btn-secondary btn-sm" id="pub-unfriend">Remover amigo</button>`;
+        actions+=`<button class="btn btn-primary btn-sm" id="pub-chat">💬 Chat</button>`;
+      }
       else if(pendingOut) actions+=`<button class="btn btn-secondary btn-sm" disabled>Pedido enviado</button>`;
       else actions+=`<button class="btn btn-primary btn-sm" id="pub-friend">💜 Pedir amizade</button>`;
       if(isFollowing) actions+=`<button class="btn btn-secondary btn-sm" id="pub-unfollow">Deixar de seguir</button>`;
@@ -1842,6 +1982,7 @@ async function renderPublicProfile(uid){
     });
     document.getElementById("pub-friend")?.addEventListener("click",()=>sendFriendRequest(uid));
     document.getElementById("pub-unfriend")?.addEventListener("click",()=>removeFriend(uid));
+    document.getElementById("pub-chat")?.addEventListener("click",()=>{ location.hash="chat/"+uid; });
     document.getElementById("pub-follow")?.addEventListener("click",()=>followUser(uid));
     document.getElementById("pub-unfollow")?.addEventListener("click",()=>unfollowUser(uid));
   }catch(e){
@@ -2029,10 +2170,276 @@ function setupUserSearch(){
   input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); run(); } });
 }
 
+
+/* ========== CHAT ========== */
+let chatUnsub = null;
+let activeChatPeer = null; // {uid, displayName, photoURL, accountId}
+const CHAT_MAX = 1000;
+
+function chatIdFor(uidA, uidB){
+  return [uidA, uidB].sort().join("_");
+}
+
+function stopChatListener(){
+  if(chatUnsub){ try{ chatUnsub(); }catch{} chatUnsub=null; }
+}
+
+async function areMutualFriends(uidA, uidB){
+  if(!uidA||!uidB||uidA===uidB) return false;
+  try{
+    const [a,b] = await Promise.all([
+      db.collection("users").doc(uidA).get(),
+      db.collection("users").doc(uidB).get()
+    ]);
+    if(!a.exists||!b.exists) return false;
+    const fa=a.data().friends||[];
+    const fb=b.data().friends||[];
+    return fa.includes(uidB) && fb.includes(uidA);
+  }catch{ return false; }
+}
+
+async function ensureChatDoc(peerUid){
+  const id = chatIdFor(currentUser.uid, peerUid);
+  const ref = db.collection("chats").doc(id);
+  const snap = await ref.get();
+  if(!snap.exists){
+    await ref.set({
+      participants: [currentUser.uid, peerUid].sort(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastMessage: "",
+      lastSender: null
+    });
+  }
+  return id;
+}
+
+function formatChatTime(ts){
+  if(!ts) return "";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  if(isNaN(d.getTime())) return "";
+  const now=new Date();
+  const sameDay = d.toDateString()===now.toDateString();
+  return sameDay
+    ? d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})
+    : d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+
+async function renderChatList(){
+  const guest=document.getElementById("chat-guest");
+  const app=document.getElementById("chat-app");
+  const list=document.getElementById("chat-friends-list");
+  if(!guest||!app||!list) return;
+  if(!currentUser||!userProfile){
+    guest.classList.remove("hidden");
+    app.classList.add("hidden");
+    stopChatListener();
+    activeChatPeer=null;
+    return;
+  }
+  guest.classList.add("hidden");
+  app.classList.remove("hidden");
+  ensureArrays(userProfile);
+  const friends = userProfile.friends||[];
+  if(!friends.length){
+    list.innerHTML=`<div class="chat-empty">Nenhum amigo ainda. Adicione amigos para conversar.</div>`;
+    return;
+  }
+  list.innerHTML=`<div class="chat-empty">Carregando...</div>`;
+  try{
+    const snaps = await Promise.all(friends.map(id=>db.collection("users").doc(id).get()));
+    // last messages from chat docs
+    const rows=[];
+    for(const snap of snaps){
+      if(!snap.exists) continue;
+      const d=snap.data();
+      const uid=snap.id;
+      let preview="Toque para conversar";
+      let updated=0;
+      try{
+        const cid=chatIdFor(currentUser.uid, uid);
+        const c=await db.collection("chats").doc(cid).get();
+        if(c.exists){
+          const cd=c.data();
+          if(cd.lastMessage) preview=cd.lastMessage;
+          if(cd.updatedAt&&cd.updatedAt.toMillis) updated=cd.updatedAt.toMillis();
+          else if(cd.updatedAt) updated=+new Date(cd.updatedAt);
+        }
+      }catch{}
+      rows.push({uid, d, preview, updated});
+    }
+    rows.sort((a,b)=>b.updated-a.updated);
+    if(!rows.length){
+      list.innerHTML=`<div class="chat-empty">Nenhum amigo encontrado.</div>`;
+      return;
+    }
+    list.innerHTML=rows.map(r=>{
+      const name=r.d.displayName||"Usuário";
+      const av=r.d.photoURL
+        ?`<div class="cf-av"><img src="${r.d.photoURL}" alt=""></div>`
+        :`<div class="cf-av">${esc(getInitials(name))}</div>`;
+      const active=activeChatPeer&&activeChatPeer.uid===r.uid?" active":"";
+      return `<div class="chat-friend-row${active}" data-peer="${esc(r.uid)}">
+        ${av}
+        <div class="cf-meta">
+          <div class="cf-name">${esc(name)}</div>
+          <div class="cf-preview">${esc(r.preview)}</div>
+        </div>
+      </div>`;
+    }).join("");
+    list.querySelectorAll(".chat-friend-row").forEach(row=>{
+      row.addEventListener("click",()=>openChatWith(row.dataset.peer));
+    });
+  }catch(e){
+    console.error(e);
+    list.innerHTML=`<div class="chat-empty">Erro ao carregar amigos. Verifique as regras do Firestore para chats.</div>`;
+  }
+}
+
+async function openChatWith(peerUid){
+  if(!currentUser||!peerUid) return;
+  if(!(await areMutualFriends(currentUser.uid, peerUid))){
+    showToast("Chat só entre amigos mútuos");
+    return;
+  }
+  try{
+    const snap=await db.collection("users").doc(peerUid).get();
+    if(!snap.exists){ showToast("Usuário não encontrado"); return; }
+    const d=snap.data();
+    activeChatPeer={uid:peerUid, displayName:d.displayName||"Usuário", photoURL:d.photoURL||null, accountId:d.accountId||""};
+    document.getElementById("chat-peer-name").textContent=activeChatPeer.displayName;
+    const av=document.getElementById("chat-peer-av");
+    if(av){
+      if(activeChatPeer.photoURL) av.innerHTML=`<img src="${activeChatPeer.photoURL}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+      else av.textContent=getInitials(activeChatPeer.displayName);
+    }
+    document.getElementById("chat-input").disabled=false;
+    document.getElementById("chat-send").disabled=false;
+    document.getElementById("chat-list-pane")?.classList.add("hidden-mobile");
+    document.getElementById("chat-thread-pane")?.classList.add("open");
+    await ensureChatDoc(peerUid);
+    listenChatMessages(peerUid);
+    renderChatList(); // refresh active state
+    location.hash="chat/"+peerUid;
+  }catch(e){
+    console.error(e);
+    showToast("Não foi possível abrir o chat");
+  }
+}
+
+function listenChatMessages(peerUid){
+  stopChatListener();
+  const cid=chatIdFor(currentUser.uid, peerUid);
+  const box=document.getElementById("chat-msgs");
+  if(box) box.innerHTML=`<div class="chat-empty">Carregando mensagens...</div>`;
+  chatUnsub = db.collection("chats").doc(cid).collection("messages")
+    .orderBy("createdAt","asc")
+    .limitToLast(100)
+    .onSnapshot(snap=>{
+      if(!box) return;
+      if(snap.empty){
+        box.innerHTML=`<div class="chat-empty">Nenhuma mensagem ainda. Diga oi 👋</div>`;
+        return;
+      }
+      box.innerHTML="";
+      snap.forEach(doc=>{
+        const m=doc.data();
+        const mine=m.senderId===currentUser.uid;
+        const row=document.createElement("div");
+        row.className="chat-bubble-row "+(mine?"mine":"theirs");
+        row.innerHTML=`<div class="chat-bubble ${mine?"mine":"theirs"}">${esc(m.text||"")}<span class="chat-time">${esc(formatChatTime(m.createdAt))}</span></div>`;
+        box.appendChild(row);
+      });
+      box.scrollTop=box.scrollHeight;
+    }, err=>{
+      console.error(err);
+      if(box) box.innerHTML=`<div class="chat-empty">Erro ao carregar mensagens (regras/índice do Firestore).</div>`;
+    });
+}
+
+async function sendChatMessage(e){
+  if(e) e.preventDefault();
+  if(!currentUser||!activeChatPeer) return;
+  const input=document.getElementById("chat-input");
+  let text=(input?.value||"").trim();
+  if(!text) return;
+  if(text.length>CHAT_MAX){ showToast("Máximo 1000 caracteres"); return; }
+  if(!(await areMutualFriends(currentUser.uid, activeChatPeer.uid))){
+    showToast("Vocês precisam ser amigos");
+    return;
+  }
+  const btn=document.getElementById("chat-send");
+  if(btn) btn.disabled=true;
+  try{
+    const cid=await ensureChatDoc(activeChatPeer.uid);
+    await db.collection("chats").doc(cid).collection("messages").add({
+      text,
+      senderId: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection("chats").doc(cid).set({
+      lastMessage: text.slice(0,120),
+      lastSender: currentUser.uid,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      participants: [currentUser.uid, activeChatPeer.uid].sort()
+    },{merge:true});
+    if(input){ input.value=""; updateChatCharCount(); }
+  }catch(err){
+    console.error(err);
+    showToast("Falha ao enviar. Confira as regras do Firestore (chats).");
+  }
+  if(btn) btn.disabled=false;
+}
+
+function updateChatCharCount(){
+  const input=document.getElementById("chat-input");
+  const el=document.getElementById("chat-char-count");
+  const n=(input?.value||"").length;
+  if(el) el.textContent=String(n);
+}
+
+function closeChatThread(){
+  stopChatListener();
+  activeChatPeer=null;
+  document.getElementById("chat-list-pane")?.classList.remove("hidden-mobile");
+  document.getElementById("chat-thread-pane")?.classList.remove("open");
+  document.getElementById("chat-peer-name").textContent="Selecione um amigo";
+  document.getElementById("chat-msgs").innerHTML=`<div class="chat-empty">Escolha um amigo na lista para começar.</div>`;
+  document.getElementById("chat-input").disabled=true;
+  document.getElementById("chat-send").disabled=true;
+  if(location.hash.startsWith("#chat/")) location.hash="chat";
+}
+
+function setupChatUI(){
+  document.getElementById("btn-chat-login")?.addEventListener("click", openAuth);
+  document.getElementById("chat-form")?.addEventListener("submit", sendChatMessage);
+  document.getElementById("chat-back")?.addEventListener("click", closeChatThread);
+  const input=document.getElementById("chat-input");
+  input?.addEventListener("input", updateChatCharCount);
+  input?.addEventListener("keydown", e=>{
+    if(e.key==="Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendChatMessage();
+    }
+  });
+}
+
+
 function router(){
   const raw=location.hash.slice(1)||"feed";
   const [page,param]=raw.split("/");
   if(page==="user"&&param){ showView("user"); renderPublicProfile(param); return; }
+  if(page==="chat"){
+    showView("chat");
+    renderChatList().then(()=>{
+      if(param && currentUser) openChatWith(param);
+      else if(!param) {
+        document.getElementById("chat-list-pane")?.classList.remove("hidden-mobile");
+      }
+    });
+    return;
+  }
+  stopChatListener();
   const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config"];
   if(pages.includes(page)){
     showView(page);
