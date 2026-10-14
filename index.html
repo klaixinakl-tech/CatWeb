@@ -770,6 +770,25 @@ h1,h2,h3,.section-title,.view-title {
 .feed-load-more{display:block;margin:22px auto 0;padding:10px 18px;border:1px solid var(--border,rgba(190,160,190,.3));border-radius:8px;background:transparent;color:var(--text,#eee5ee);cursor:pointer}
 .feed-load-more:hover{border-color:#b89b78}
 .feed-empty{border:1px dashed var(--border,rgba(190,160,190,.28));border-radius:10px;padding:28px 18px;text-align:center;color:var(--muted,#a89ba9);line-height:1.6}
+.post-author-link{color:inherit;text-decoration:none;min-width:0;display:flex;align-items:center;gap:10px;flex:1}
+.post-author-link:hover .post-author,.comment-author-link:hover{color:#d6b78b;text-decoration:underline}
+.post-author-link .post-author-meta{flex:1}
+.post-original-card{margin:12px 0 2px 52px;padding:13px 14px;border:1px solid var(--border,rgba(190,160,190,.25));border-radius:9px;background:rgba(0,0,0,.12);cursor:pointer}
+.post-original-card:hover{border-color:rgba(184,155,120,.6)}
+.post-original-head{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted,#a89ba9)}
+.post-original-head strong{color:var(--text,#eee5ee)}
+.post-original-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.88rem;line-height:1.5;margin-top:8px;color:var(--text,#e8e0e9)}
+.feed-mention{color:#d6b78b;font-weight:600;text-decoration:none;background:rgba(184,155,120,.10);border-radius:3px;padding:0 2px}
+.feed-mention:hover{text-decoration:underline;background:rgba(184,155,120,.18)}
+.notification-list{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.notification-item{display:flex;gap:12px;align-items:flex-start;padding:15px;background:var(--card,rgba(24,20,29,.9));border:1px solid var(--border,rgba(190,160,190,.22));border-radius:10px;cursor:pointer}
+.notification-item.unread{border-color:rgba(184,155,120,.65);background:rgba(184,155,120,.07)}
+.notification-icon{color:#b89b78;font-size:1.15rem;line-height:1.4}
+.notification-copy{min-width:0;flex:1;font-size:.88rem;line-height:1.5;color:var(--text,#eee5ee)}
+.notification-copy small{display:block;color:var(--muted,#a89ba9);margin-top:5px}
+.notification-preview{display:block;color:var(--muted,#a89ba9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.notification-topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.notification-topline button{background:none;border:0;color:#b89b78;cursor:pointer;font-size:.8rem}
 @media(max-width:600px){.feed-heading{padding-top:22px}.composer-card,.feed-post-card{padding:14px}.feed-tab{padding:12px 13px}.post-actions{gap:2px}.post-action{padding:7px 8px}.comment-form{align-items:stretch}.comment-form button{padding:9px}}
   </style>
 </head>
@@ -906,11 +925,11 @@ h1,h2,h3,.section-title,.view-title {
 
     <!-- NOTIFICAÇÕES -->
     <div id="view-notificacoes" class="view">
-      <div class="container">
-        <div class="placeholder-card">
-          <h2>Notificações</h2>
-          <p>Alertas gerais — em construção. Pedidos de amizade ficam no <a href="#correio">Correio</a>.</p>
-        </div>
+      <div class="container feed-container">
+        <div class="feed-heading"><p class="eyebrow">Sinais do círculo</p><h1>Notificações</h1><p>Menções, respostas, curtidas e reposts que chegaram até você.</p></div>
+        <div id="notifications-guest" class="search-empty hidden">Entre na sua conta para ver as notificações.</div>
+        <div class="notification-topline"><span id="notifications-status" class="feed-status">Carregando notificações…</span><button type="button" id="notifications-read-all">Marcar todas como lidas</button></div>
+        <div id="notifications-list" class="notification-list"></div>
       </div>
     </div>
 
@@ -1743,10 +1762,10 @@ function onAuthChanged(user){
     updateUserArea();
     loadUserProfile(user.uid).then(async ()=>{
       if(await enforceBanOnAuth(user)){ updateUserArea(); updateModNav(); return; }
-      updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed();
+      updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed(); renderNotifications();
     });
   }else{
-    userProfile=null; updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed();
+    userProfile=null; updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed(); renderNotifications();
   }
 }
 auth.onAuthStateChanged(onAuthChanged);
@@ -2696,6 +2715,67 @@ function feedAvatarHtml(url,name){
   if(url) return `<div class="feed-avatar"><img src="${esc(url)}" alt=""></div>`;
   return `<div class="feed-avatar">${esc(getInitials(name)||"✦")}</div>`;
 }
+function feedTextHtml(text){
+  const safe=esc(String(text||""));
+  return safe.replace(/@((?:FW|CW)-[A-Za-z0-9]{4,12})/gi,(match,id)=>`<a href="#" class="feed-mention" data-mention-id="${esc(normalizeAccountId(id))}">@${esc(id.toUpperCase())}</a>`).replace(/\n/g,"<br>");
+}
+function bindFeedMentions(root){
+  root.querySelectorAll(".feed-mention[data-mention-id]").forEach(a=>a.addEventListener("click",async e=>{
+    e.preventDefault();e.stopPropagation();const id=a.dataset.mentionId;const info=await resolveAccountId(id);
+    if(info)location.hash="user/"+info.uid;else showToast("Conta @"+id+" não encontrada.");
+  }));
+}
+async function sendFeedNotification(recipientUid,type,post,extra={}){
+  if(!currentUser||!recipientUid||recipientUid===currentUser.uid)return;
+  try{
+    const actorName=userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0];
+    await db.collection("users").doc(recipientUid).collection("notifications").add({
+      recipientId:recipientUid,actorId:currentUser.uid,actorName,actorAccountId:userProfile?.accountId||"",
+      type,postId:post?.id||extra.postId||"",postText:String(post?.text||extra.postText||"").slice(0,180),
+      message:String(extra.message||"").slice(0,180),createdAt:firebase.firestore.FieldValue.serverTimestamp(),read:false
+    });
+  }catch(err){console.warn("Notificação não enviada:",err?.code||err?.message||err);}
+}
+async function notifyMentionedUsers(text,post,context="post"){
+  const ids=[...new Set((String(text||"").match(/@((?:FW|CW)-[A-Za-z0-9]{4,12})/gi)||[]).map(x=>normalizeAccountId(x)))];
+  for(const id of ids){const info=await resolveAccountId(id);if(info)await sendFeedNotification(info.uid,"mention",post,{message:context==="comment"?"mencionou você em uma resposta":"mencionou você em uma publicação"});}
+}
+function notificationMessage(n){
+  const name=esc(n.actorName||"Alguém");
+  if(n.type==="like")return `${name} curtiu sua publicação.`;
+  if(n.type==="comment")return `${name} respondeu à sua publicação.`;
+  if(n.type==="reply")return `${name} respondeu ao seu comentário.`;
+  if(n.type==="repost")return `${name} repostou sua publicação.`;
+  if(n.type==="mention")return `${name} mencionou você.`;
+  return `${name} interagiu com você.`;
+}
+async function renderNotifications(){
+  const guest=document.getElementById("notifications-guest"),list=document.getElementById("notifications-list"),status=document.getElementById("notifications-status"),readAll=document.getElementById("notifications-read-all");
+  if(!list||!status)return;
+  if(!currentUser){guest?.classList.remove("hidden");list.innerHTML="";status.textContent="";readAll?.classList.add("hidden");return;}
+  guest?.classList.add("hidden");readAll?.classList.remove("hidden");status.textContent="Carregando notificações…";list.innerHTML="";
+  try{
+    const snap=await db.collection("users").doc(currentUser.uid).collection("notifications").orderBy("createdAt","desc").limit(50).get();
+    if(snap.empty){status.textContent="Nenhuma notificação por enquanto.";return;}
+    status.textContent="";
+    snap.forEach(doc=>{
+      const n={id:doc.id,...doc.data()};const item=document.createElement("article");item.className="notification-item"+(n.read?"":" unread");
+      const preview=n.message||n.postText||"";
+      item.innerHTML=`<span class="notification-icon">${n.type==="like"?"♡":n.type==="repost"?"⤴":n.type==="mention"?"@":"✧"}</span><div class="notification-copy"><strong>${notificationMessage(n)}</strong>${preview?`<span class="notification-preview">${esc(preview)}</span>`:""}<small>${esc(feedTime(n.createdAt))}</small></div>`;
+      item.addEventListener("click",async()=>{
+        if(!n.read){try{await db.collection("users").doc(currentUser.uid).collection("notifications").doc(n.id).update({read:true});item.classList.remove("unread");}catch(e){console.warn(e);}}
+        if(n.postId)location.hash="feed";
+      });list.appendChild(item);
+    });
+  }catch(err){console.error("Erro ao carregar notificações:",err);status.textContent=err?.code==="permission-denied"?"As regras do Firestore precisam permitir acessar suas notificações.":"Não foi possível carregar as notificações.";}
+}
+function setupNotificationsUI(){
+  document.getElementById("notifications-read-all")?.addEventListener("click",async()=>{
+    if(!currentUser)return;
+    try{const snap=await db.collection("users").doc(currentUser.uid).collection("notifications").where("read","==",false).limit(400).get();const batch=db.batch();snap.docs.forEach(d=>batch.update(d.ref,{read:true}));if(!snap.empty)await batch.commit();await renderNotifications();showToast("Notificações marcadas como lidas.");}
+    catch(e){console.error(e);showToast("Não foi possível marcar as notificações como lidas.");}
+  });
+}
 function feedBlocked(post){
   if(!currentUser||!userProfile) return false;
   const blocked=userProfile.blocked||[];
@@ -2753,6 +2833,8 @@ async function createFeedPost(e){
       likesCount:0,commentsCount:0,repostsCount:0
     };
     const ref=await db.collection("posts").add(doc);
+    const createdPost={id:ref.id,...doc};
+    await notifyMentionedUsers(text,createdPost,"post");
     if(input){input.value="";input.style.height="";}
     const count=document.getElementById("post-char-count");if(count)count.textContent=`0 / ${POST_MAX_CHARS}`;
     showToast("Publicação enviada ao CatWeb.");
@@ -2813,9 +2895,11 @@ async function renderFeedPosts(posts,append){
     const name=feedAuthorName(post);
     const card=document.createElement("article");card.className="feed-post-card";card.dataset.postId=post.id;
     const isRepost=!!post.repostOf;
-    const originalLink=isRepost?`<p class="post-repost-note">✧ ${esc(name)} compartilhou uma publicação</p>`:"";
-    card.innerHTML=`${originalLink}<div class="post-head">${feedAvatarHtml(post.authorPhotoURL||post.photoURL,name)}<div class="post-author-meta"><span class="post-author">${esc(name)}</span><span class="post-handle">${post.authorAccountId?`@${esc(post.authorAccountId)}`:"@catweb"}</span><span class="post-time">· ${esc(feedTime(post.createdAt))}</span></div>${post.authorId===currentUser?.uid?'<button type="button" class="post-action post-delete" data-post-action="delete" title="Excluir publicação" aria-label="Excluir publicação">Excluir</button>':''}</div><div class="post-body">${esc(post.text||"")}</div><div class="post-actions"><button type="button" class="post-action" data-post-action="like"><span aria-hidden="true">♡</span><span class="like-count">${Number(post.likesCount)||0}</span> Curtir</button><button type="button" class="post-action" data-post-action="comments"><span aria-hidden="true">☷</span><span class="comment-count">${Number(post.commentsCount)||0}</span> Responder</button><button type="button" class="post-action" data-post-action="repost"><span aria-hidden="true">⤴</span><span class="repost-count">${Number(post.repostsCount)||0}</span> Repostar</button></div><section class="post-comments hidden" aria-label="Comentários"><div class="comment-list"><div class="feed-status">Carregando respostas…</div></div><p class="comment-replying hidden"></p><form class="comment-form"><label class="sr-only">Escreva uma resposta</label><textarea class="comment-input" maxlength="500" rows="1" placeholder="Escreva uma resposta…" required></textarea><button type="submit" class="btn btn-primary">Enviar</button></form></section>`;
+    const originalLink=isRepost?`<p class="post-repost-note">✧ ${esc(name)} repostou</p>`:"";
+    card.innerHTML=`${originalLink}<div class="post-head"><a href="#user/${esc(post.authorId||"")}" class="post-author-link" title="Ver perfil">${feedAvatarHtml(post.authorPhotoURL||post.photoURL,name)}<span class="post-author-meta"><span class="post-author">${esc(name)}</span><span class="post-handle">${post.authorAccountId?`@${esc(post.authorAccountId)}`:"@catweb"}</span><span class="post-time">· ${esc(feedTime(post.createdAt))}</span></span></a>${post.authorId===currentUser?.uid?'<button type="button" class="post-action post-delete" data-post-action="delete" title="Excluir publicação" aria-label="Excluir publicação">Excluir</button>':''}</div>${isRepost?'<div class="post-body post-repost-commentary">'+feedTextHtml(post.commentary||"")+'</div><div class="post-original-card" role="link" tabindex="0" aria-label="Abrir publicação original"><div class="feed-status">Carregando publicação original…</div></div>':`<div class="post-body">${feedTextHtml(post.text||"")}</div>`}<div class="post-actions"><button type="button" class="post-action" data-post-action="like"><span aria-hidden="true">♡</span><span class="like-count">${Number(post.likesCount)||0}</span> Curtir</button><button type="button" class="post-action" data-post-action="comments"><span aria-hidden="true">☷</span><span class="comment-count">${Number(post.commentsCount)||0}</span> Responder</button><button type="button" class="post-action" data-post-action="repost"><span aria-hidden="true">⤴</span><span class="repost-count">${Number(post.repostsCount)||0}</span> Repostar</button></div><section class="post-comments hidden" aria-label="Comentários"><div class="comment-list"><div class="feed-status">Carregando respostas…</div></div><p class="comment-replying hidden"></p><form class="comment-form"><label class="sr-only">Escreva uma resposta</label><textarea class="comment-input" maxlength="500" rows="1" placeholder="Escreva uma resposta…" required></textarea><button type="submit" class="btn btn-primary">Enviar</button></form></section>`;
     list.appendChild(card);
+    bindFeedMentions(card);
+    if(isRepost)loadOriginalRepost(post,card);
     const likeBtn=card.querySelector('[data-post-action="like"]');
     if(currentUser){
       try{
@@ -2829,6 +2913,18 @@ async function renderFeedPosts(posts,append){
     card.querySelector('[data-post-action="delete"]')?.addEventListener("click",()=>deletePost(post,card));
     card.querySelector(".comment-form")?.addEventListener("submit",e=>createPostComment(e,post,card));
   }
+}
+async function loadOriginalRepost(post,card){
+  const box=card.querySelector(".post-original-card");if(!box)return;
+  try{
+    const snap=await db.collection("posts").doc(post.repostOf).get();
+    if(!snap.exists){box.innerHTML='<div class="post-original-text">Publicação original indisponível.</div>';return;}
+    const original={id:snap.id,...snap.data()};const name=feedAuthorName(original);
+    box.innerHTML=`<div class="post-original-head">${feedAvatarHtml(original.authorPhotoURL||original.photoURL,name)}<span><strong>${esc(name)}</strong> ${original.authorAccountId?`· @${esc(original.authorAccountId)}`:""} · ${esc(feedTime(original.createdAt))}</span></div><div class="post-original-text">${feedTextHtml(original.text||"")}</div>`;
+    bindFeedMentions(box);
+    const open=()=>{const target=document.querySelector(`[data-post-id="${CSS.escape(original.id)}"]`);if(target)target.scrollIntoView({behavior:"smooth",block:"center"});else{location.hash="feed";showToast("A publicação original está no feed.");}};
+    box.addEventListener("click",open);box.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
+  }catch(e){console.warn("Não foi possível carregar o repost original:",e);box.innerHTML='<div class="post-original-text">Não foi possível carregar a publicação original.</div>';}
 }
 async function togglePostLike(post,card){
   if(!currentUser){showToast("Entre na sua conta para curtir.");return;}
@@ -2847,6 +2943,7 @@ async function togglePostLike(post,card){
     const liked=btn.classList.toggle("is-liked");btn.querySelector('[aria-hidden="true"]').textContent=liked?"♥":"♡";
     const count=btn.querySelector(".like-count");if(count)count.textContent=String(Math.max(0,(Number(count.textContent)||0)+(liked?1:-1)));
     post.likesCount=Math.max(0,(Number(post.likesCount)||0)+(liked?1:-1));
+    if(liked)await sendFeedNotification(post.authorId,"like",post,{});
   }catch(err){
     console.error("Falha na curtida:",err);
     showToast(err?.code==="permission-denied"?"As regras do Firestore precisam permitir registrar curtidas e atualizar o contador.":"Não foi possível registrar a curtida.");
@@ -2875,7 +2972,8 @@ async function loadPostComments(post,card){
 }
 function commentElement(comment,post,card){
   const el=document.createElement("div");el.className="comment-item";
-  el.innerHTML=`<div class="comment-meta"><strong>${esc(comment.authorName||"Usuário")}</strong><span>${comment.authorAccountId?`@${esc(comment.authorAccountId)} · `:""}${esc(feedTime(comment.createdAt))}</span></div><div class="comment-body">${esc(comment.text||"")}</div><button type="button" class="comment-reply" data-reply-id="${esc(comment.id)}" data-reply-name="${esc(comment.authorName||"usuário")}">Responder</button>`;
+  el.innerHTML=`<div class="comment-meta"><a class="comment-author-link" href="#user/${esc(comment.authorId||"")}"><strong>${esc(comment.authorName||"Usuário")}</strong></a><span>${comment.authorAccountId?`@${esc(comment.authorAccountId)} · `:""}${esc(feedTime(comment.createdAt))}</span></div><div class="comment-body">${feedTextHtml(comment.text||"")}</div><button type="button" class="comment-reply" data-reply-id="${esc(comment.id)}" data-reply-name="${esc(comment.authorName||"usuário")}">Responder</button>`;
+  bindFeedMentions(el);
   el.querySelector(".comment-reply")?.addEventListener("click",()=>{
     if(!currentUser){showToast("Entre na sua conta para responder.");return;}
     feedReplyTargets[post.id]={id:comment.id,name:comment.authorName||"usuário"};
@@ -2893,8 +2991,12 @@ async function createPostComment(e,post,card){
   try{
     const target=feedReplyTargets[post.id];
     const comment={text,authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",parentId:target?.id||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-    await db.collection("posts").doc(post.id).collection("comments").add(comment);
+    const commentRef=await db.collection("posts").doc(post.id).collection("comments").add(comment);
     await db.collection("posts").doc(post.id).update({commentsCount:firebase.firestore.FieldValue.increment(1)});
+    const notificationPost={...post,id:post.id};
+    await sendFeedNotification(post.authorId,target?"reply":"comment",notificationPost,{message:text});
+    if(target){const parentSnap=await db.collection("posts").doc(post.id).collection("comments").doc(target.id).get();if(parentSnap.exists)await sendFeedNotification(parentSnap.data().authorId,"reply",notificationPost,{message:text});}
+    await notifyMentionedUsers(text,notificationPost,"comment");
     if(input)input.value="";delete feedReplyTargets[post.id];
     const note=card.querySelector(".comment-replying");note?.classList.add("hidden");
     const count=card.querySelector(".comment-count");if(count)count.textContent=String((Number(count.textContent)||0)+1);
@@ -2912,7 +3014,7 @@ async function repostPost(post){
     const batch=db.batch();
     batch.set(ref,{text:post.text||"",authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,type:"repost",repostOf:post.id,originalAuthorId:post.authorId,originalAuthorName:feedAuthorName(post),createdAt:firebase.firestore.FieldValue.serverTimestamp(),likesCount:0,commentsCount:0,repostsCount:0});
     batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1)});
-    await batch.commit();showToast("Publicação repostada.");resetFeed();
+    await batch.commit();await sendFeedNotification(post.authorId,"repost",post,{});showToast("Publicação repostada.");resetFeed();
   }catch(err){console.error("Falha ao repostar:",err);showToast(err?.code==="permission-denied"?"As regras do Firestore precisam permitir reposts.":"Não foi possível repostar.");}
 }
 async function deletePost(post,card){
@@ -2945,6 +3047,7 @@ function router(){
     if(page==="perfil") renderProfile();
     if(page==="config") renderConfig();
     if(page==="correio") renderMailbox();
+    if(page==="notificacoes") renderNotifications();
     if(page==="moderacao") renderModeration();
     if(page==="busca"){
       const input=document.getElementById("user-search-input");
@@ -2972,6 +3075,7 @@ function runCatWebTests(){
 
 document.addEventListener("DOMContentLoaded",()=>{
   setupFeedUI();
+  setupNotificationsUI();
   const theme=localStorage.getItem(THEME_KEY)||"dark";
   document.documentElement.setAttribute("data-theme",theme);
   updateUserArea();
