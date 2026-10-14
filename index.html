@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <style>
 :root, [data-theme="light"] {
   --bg: #f4efe6;
@@ -1656,34 +1657,19 @@ function copyText(t){
 
 let pendingAvatar=null, pendingBanner=null;
 
-function readMediaFile(file, maxSide){
-  return new Promise((resolve,reject)=>{
-    if(!file||!file.type.startsWith("image/")){ reject(new Error("Arquivo inválido")); return; }
-    if(file.size>2.8*1024*1024){ showToast("Arquivo grande (máx ~2.8MB)"); reject(); return; }
-    // GIF: keep as-is (animation)
-    if(file.type==="image/gif"||file.name.toLowerCase().endsWith(".gif")){
-      const r=new FileReader();
-      r.onload=e=>resolve(e.target.result);
-      r.onerror=reject;
-      r.readAsDataURL(file);
-      return;
-    }
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const img=new Image();
-      img.onload=()=>{
-        const canvas=document.createElement("canvas");
-        let w=img.width,h=img.height;
-        const max=maxSide||600;
-        if(w>h&&w>max){h=h*max/w;w=max;} else if(h>max){w=w*max/h;h=max;}
-        canvas.width=w; canvas.height=h;
-        canvas.getContext("2d").drawImage(img,0,0,w,h);
-        resolve(canvas.toDataURL("image/jpeg",0.78));
-      };
-      img.onerror=reject; img.src=e.target.result;
-    };
-    reader.onerror=reject; reader.readAsDataURL(file);
-  });
+async function readMediaFile(file, mediaKind){
+  if(!file || !file.type.startsWith("image/")) throw new Error("Escolha um arquivo de imagem válido.");
+  if(!currentUser) throw new Error("Entre na sua conta antes de enviar imagens.");
+  // GIFs do Pinterest podem ultrapassar o limite de campo do Firestore quando salvos como Base64.
+  // Por isso, o arquivo original é enviado ao Firebase Storage e só a URL fica no Firestore.
+  if(file.size > 10 * 1024 * 1024) throw new Error("A imagem deve ter no máximo 10 MB.");
+  if(!firebase.storage) throw new Error("O Firebase Storage não foi carregado. Atualize a página e tente novamente.");
+  const ext = (file.name.split(".").pop() || (file.type === "image/gif" ? "gif" : "img"))
+    .toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8) || "img";
+  const path = `users/${currentUser.uid}/profile/${mediaKind}_${Date.now()}.${ext}`;
+  const ref = firebase.storage().ref().child(path);
+  const snapshot = await ref.put(file, {contentType: file.type});
+  return await snapshot.ref.getDownloadURL();
 }
 
 function setupUpload(areaId,inputId,previewId,setVal,isBanner){
@@ -1692,11 +1678,18 @@ function setupUpload(areaId,inputId,previewId,setVal,isBanner){
   area.onclick=()=>input.click();
   input.onchange=async()=>{
     const f=input.files?.[0]; if(!f) return;
+    area.style.opacity="0.65";
     try{
-      const data=await readMediaFile(f, isBanner?900:400);
-      setVal(data);
-      if(preview){ preview.src=data; preview.classList.remove("hidden"); }
-    }catch{}
+      const url=await readMediaFile(f, isBanner ? "banner" : "avatar");
+      setVal(url);
+      if(preview){ preview.src=url; preview.classList.remove("hidden"); }
+      showToast(isBanner ? "GIF/banner enviado!" : "Foto de perfil enviada!");
+    }catch(err){
+      showToast(err?.message || "Não foi possível enviar a imagem.");
+    }finally{
+      area.style.opacity="";
+      input.value="";
+    }
   };
 }
 
