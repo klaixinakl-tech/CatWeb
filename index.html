@@ -2489,6 +2489,8 @@ function router(){
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
+  // Inicializa os eventos do chat junto com o restante da interface.
+  setupChatUI();
   const theme=localStorage.getItem(THEME_KEY)||"light";
   document.documentElement.setAttribute("data-theme",theme);
   updateUserArea();
