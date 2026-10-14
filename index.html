@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark" data-build="CATWEB-NOCTURNE-NAV-2026-10-14">
+<html lang="pt-BR" data-theme="dark" data-build="CATWEB-PROFILE-NOSTORAGE-REVIEW-2026-10-14">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <style>
 :root, [data-theme="light"] {
   --bg: #f4efe6;
@@ -814,6 +813,32 @@ h1,h2,h3,.section-title,.view-title {
 .notification-topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .notification-topline button{background:none;border:0;color:#b89b78;cursor:pointer;font-size:.8rem}
 @media(max-width:600px){.feed-heading{padding-top:22px}.composer-card,.feed-post-card{padding:14px}.feed-tab{padding:12px 13px}.post-actions{gap:2px}.post-action{padding:7px 8px}.comment-form{align-items:stretch}.comment-form button{padding:9px}}
+
+/* Ajustes de contraste e campos do feed por tema */
+:root, [data-theme="light"] {
+  --text: var(--ink);
+  --feed-field-bg: #fffafc;
+  --feed-inset-bg: rgba(70, 45, 65, .045);
+}
+[data-theme="dark"] {
+  --text: var(--ink);
+  --feed-field-bg: #17111b;
+  --feed-inset-bg: rgba(0, 0, 0, .12);
+}
+#post-composer-text, .comment-input {
+  background: var(--feed-field-bg);
+  color: var(--ink);
+}
+.post-original-card {
+  background: var(--feed-inset-bg);
+}
+.feed-tab {
+  font-family: var(--font-ui);
+}
+.img-upload-area[aria-busy="true"] {
+  cursor: progress;
+}
+
   </style>
 </head>
 <body>
@@ -1125,10 +1150,10 @@ h1,h2,h3,.section-title,.view-title {
       <div class="container">
         <div class="placeholder-card" style="text-align:left">
           <h2>⋄ Aba de teste do CatWeb</h2>
-          <p>Esta aba foi adicionada numa alteração nova do arquivo. Se você está vendo esta tela no GitHub Pages, a versão com a aba de teste foi publicada.</p>
+          <p>Verificações locais de interface do CatWeb. As operações reais do Firebase ainda precisam ser testadas com uma conta conectada.</p>
           <div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin:14px 0">
             <div style="font-weight:700">Identificação da versão</div>
-            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-GIF-STORAGE-FIX-2026-10-14-B</div>
+            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-PROFILE-NOSTORAGE-REVIEW-2026-10-14</div>
             <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Correção de upload de imagens para Firebase Storage + teste de versão B.</div>
           </div>
           <h3 style="margin:14px 0 8px">Verificações locais</h3>
@@ -1137,7 +1162,7 @@ h1,h2,h3,.section-title,.view-title {
             <div data-test="chat">⏳ Elementos do chat</div>
             <div data-test="auth">⏳ Estado de autenticação</div>
             <div data-test="counter">⏳ Contador de caracteres</div>
-            <div data-test="storage">⏳ Firebase Storage</div>
+            <div data-test="images">⏳ Personalização de imagens</div>
           </div>
           <button type="button" class="btn btn-primary" id="btn-run-tests" style="margin-top:14px">Executar testes novamente</button>
           <p style="font-size:.85rem;color:var(--muted);margin-top:12px">As verificações não enviam mensagens nem alteram dados do Firebase.</p>
@@ -1197,19 +1222,21 @@ h1,h2,h3,.section-title,.view-title {
           <button type="button" class="btn btn-secondary btn-sm" id="ep-add-link" style="margin-top:4px">+ Adicionar link</button>
           <div class="form-hint">Até 6 links (Instagram, Linktree, site…). Aparecem no perfil como botões.</div>
         </div>
-        <div class="form-row"><label>Foto de perfil (imagem ou GIF)</label>
+        <div class="form-row"><label>Foto de perfil (imagem ou GIF pequeno)</label>
           <div class="img-upload-area" id="ep-avatar-area">
             <input type="file" id="ep-avatar" accept="image/*,.gif">
             <div>✧ Escolher foto / GIF</div>
             <img id="ep-avatar-preview" class="img-preview av hidden" alt="">
           </div>
+          <div class="form-hint">Fotos comuns são compactadas no seu aparelho. GIFs animados precisam ser pequenos para salvar sem Firebase Storage.</div>
         </div>
-        <div class="form-row"><label>Banner (imagem ou GIF)</label>
+        <div class="form-row"><label>Banner (imagem ou GIF pequeno)</label>
           <div class="img-upload-area" id="ep-banner-area">
             <input type="file" id="ep-banner" accept="image/*,.gif">
             <div>◇ Escolher banner / GIF</div>
             <img id="ep-banner-preview" class="img-preview hidden" alt="">
           </div>
+          <div class="form-hint">O banner é salvo no perfil junto dos outros dados. Imagens estáticas são redimensionadas automaticamente.</div>
         </div>
         <div class="form-error hidden" id="ep-error"></div>
         <button type="submit" class="btn btn-primary btn-full" id="ep-save">Salvar</button>
@@ -1893,37 +1920,152 @@ function copyText(t){
 
 let pendingAvatar=null, pendingBanner=null;
 
+const PROFILE_IMAGE_LIMITS = {
+  avatar: { maxChars: 175000, maxSide: 480, gifBytes: 115000 },
+  banner: { maxChars: 420000, maxSide: 1400, gifBytes: 290000 }
+};
+
+function readFileAsDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||""));
+    reader.onerror=()=>reject(new Error("Não foi possível ler esse arquivo. Tente selecionar a imagem novamente."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadLocalImage(file){
+  return new Promise((resolve,reject)=>{
+    const objectUrl=URL.createObjectURL(file);
+    const image=new Image();
+    image.onload=()=>{
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror=()=>{
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("O navegador não conseguiu abrir essa imagem. Tente JPG, PNG ou WebP."));
+    };
+    image.src=objectUrl;
+  });
+}
+
+function canvasToCompactDataURL(canvas, quality){
+  // WebP costuma manter boa qualidade em tamanho menor e conserva transparência.
+  const webp=canvas.toDataURL("image/webp",quality);
+  if(webp.startsWith("data:image/webp")) return webp;
+
+  // Fallback para navegadores sem exportação WebP.
+  // Preenche a transparência com a cor da superfície atual para evitar fundo preto.
+  const fallback=document.createElement("canvas");
+  fallback.width=canvas.width;
+  fallback.height=canvas.height;
+  const ctx=fallback.getContext("2d");
+  if(!ctx) throw new Error("O navegador não conseguiu processar a imagem.");
+  ctx.fillStyle=document.documentElement.getAttribute("data-theme")==="dark"?"#17111b":"#fffcf7";
+  ctx.fillRect(0,0,fallback.width,fallback.height);
+  ctx.drawImage(canvas,0,0);
+  return fallback.toDataURL("image/jpeg",quality);
+}
+
 async function readMediaFile(file, mediaKind){
-  if(!file || !file.type.startsWith("image/")) throw new Error("Escolha um arquivo de imagem válido.");
-  if(!currentUser) throw new Error("Entre na sua conta antes de enviar imagens.");
-  // GIFs do Pinterest podem ultrapassar o limite de campo do Firestore quando salvos como Base64.
-  // Por isso, o arquivo original é enviado ao Firebase Storage e só a URL fica no Firestore.
-  if(file.size > 10 * 1024 * 1024) throw new Error("A imagem deve ter no máximo 10 MB.");
-  if(!firebase.storage) throw new Error("O Firebase Storage não foi carregado. Atualize a página e tente novamente.");
-  const ext = (file.name.split(".").pop() || (file.type === "image/gif" ? "gif" : "img"))
-    .toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8) || "img";
-  const path = `users/${currentUser.uid}/profile/${mediaKind}_${Date.now()}.${ext}`;
-  const ref = firebase.storage().ref().child(path);
-  const snapshot = await ref.put(file, {contentType: file.type});
-  return await snapshot.ref.getDownloadURL();
+  if(!file || !file.type.startsWith("image/")) {
+    throw new Error("Escolha um arquivo de imagem válido.");
+  }
+  if(!currentUser) throw new Error("Entre na sua conta antes de personalizar o perfil.");
+  if(file.size > 20 * 1024 * 1024) {
+    throw new Error("Esse arquivo tem mais de 20 MB. Escolha uma imagem menor.");
+  }
+
+  const kind=mediaKind==="banner"?"banner":"avatar";
+  const limits=PROFILE_IMAGE_LIMITS[kind];
+  const isGif=file.type==="image/gif" || /\\.gif$/i.test(file.name);
+
+  // GIFs animados são mantidos sem conversão, mas só se couberem com segurança
+  // no documento Firestore. Imagens estáticas são compactadas no próprio aparelho.
+  if(isGif){
+    if(file.size > limits.gifBytes){
+      throw new Error(
+        "Esse GIF é grande demais para salvar sem Firebase Storage. Sem Blaze, use uma versão menor ou escolha uma imagem estática."
+      );
+    }
+    const dataUrl=await readFileAsDataURL(file);
+    if(dataUrl.length > limits.maxChars){
+      throw new Error("O GIF ficou grande demais para o perfil. Escolha um arquivo menor.");
+    }
+    return dataUrl;
+  }
+
+  const image=await loadLocalImage(file);
+  if(!image.naturalWidth || !image.naturalHeight) {
+    throw new Error("A imagem está inválida ou não pode ser aberta.");
+  }
+
+  let width=image.naturalWidth;
+  let height=image.naturalHeight;
+  const scale=Math.min(1,limits.maxSide/Math.max(width,height));
+  width=Math.max(1,Math.round(width*scale));
+  height=Math.max(1,Math.round(height*scale));
+
+  const canvas=document.createElement("canvas");
+  const ctx=canvas.getContext("2d");
+  if(!ctx) throw new Error("Este navegador não consegue processar imagens.");
+
+  let best="";
+  for(let attempt=0;attempt<10;attempt++){
+    canvas.width=width;
+    canvas.height=height;
+    ctx.clearRect(0,0,width,height);
+    ctx.drawImage(image,0,0,width,height);
+
+    const quality=[0.86,0.80,0.74,0.68,0.62][Math.min(attempt,4)];
+    best=canvasToCompactDataURL(canvas,quality);
+    if(best.length<=limits.maxChars) return best;
+
+    // Reduz dimensões aos poucos para garantir que a soma de avatar + banner
+    // fique confortavelmente abaixo do limite de 1 MiB por documento do Firestore.
+    width=Math.max(1,Math.round(width*0.82));
+    height=Math.max(1,Math.round(height*0.82));
+  }
+
+  if(best && best.length<=limits.maxChars) return best;
+  throw new Error("Não foi possível compactar essa imagem o suficiente. Tente uma imagem menor.");
 }
 
 function setupUpload(areaId,inputId,previewId,setVal,isBanner){
-  const area=document.getElementById(areaId), input=document.getElementById(inputId), preview=document.getElementById(previewId);
+  const area=document.getElementById(areaId);
+  const input=document.getElementById(inputId);
+  const preview=document.getElementById(previewId);
   if(!area||!input) return;
-  area.onclick=()=>input.click();
+
+  area.onclick=(event)=>{
+    if(event.target!==input && !input.disabled) input.click();
+  };
+  input.addEventListener("click",event=>event.stopPropagation());
+
   input.onchange=async()=>{
-    const f=input.files?.[0]; if(!f) return;
+    const file=input.files?.[0];
+    if(!file) return;
+    const label=isBanner?"banner":"foto de perfil";
     area.style.opacity="0.65";
+    area.style.pointerEvents="none";
+    area.setAttribute("aria-busy","true");
     try{
-      const url=await readMediaFile(f, isBanner ? "banner" : "avatar");
-      setVal(url);
-      if(preview){ preview.src=url; preview.classList.remove("hidden"); }
-      showToast(isBanner ? "GIF/banner enviado!" : "Foto de perfil enviada!");
+      const dataUrl=await readMediaFile(file,label);
+      setVal(dataUrl);
+      if(preview){
+        preview.onload=null;
+        preview.onerror=()=>showToast("A imagem foi preparada, mas a prévia não pôde ser exibida.");
+        preview.src=dataUrl;
+        preview.classList.remove("hidden");
+      }
+      showToast(isBanner?"Banner preparado. Toque em Salvar para aplicar.":"Foto preparada. Toque em Salvar para aplicar.");
     }catch(err){
-      showToast(err?.message || "Não foi possível enviar a imagem.");
+      showToast(err?.message || "Não foi possível preparar essa imagem.");
     }finally{
       area.style.opacity="";
+      area.style.pointerEvents="";
+      area.removeAttribute("aria-busy");
       input.value="";
     }
   };
@@ -1955,18 +2097,20 @@ function renderProfile(){
   document.getElementById("stat-following").textContent=String((p.following||[]).length);
 
   const banner=document.getElementById("profile-banner-el");
-  if(p.bannerURL){ banner.innerHTML=`<img src="${p.bannerURL}" alt="">`; banner.style.background=""; }
+  if(p.bannerURL){ banner.innerHTML=`<img src="${esc(p.bannerURL)}" alt="">`; banner.style.background=""; }
   else { banner.innerHTML=""; banner.style.background="linear-gradient(135deg,#3a1a1a,var(--accent))"; }
 
   const av=document.getElementById("profile-avatar-el");
-  if(p.photoURL) av.innerHTML=`<img src="${p.photoURL}" alt="">`;
+  if(p.photoURL) av.innerHTML=`<img src="${esc(p.photoURL)}" alt="">`;
   else { av.textContent=getInitials(name); av.style.background="var(--accent)"; }
 
   // menu
   const drop=document.getElementById("own-menu-drop");
-  document.getElementById("own-menu-btn")?.addEventListener("click",e=>{
-    e.stopPropagation(); drop?.classList.toggle("hidden");
-  });
+  const ownMenuBtn=document.getElementById("own-menu-btn");
+  if(ownMenuBtn) ownMenuBtn.onclick=e=>{
+    e.stopPropagation();
+    drop?.classList.toggle("hidden");
+  };
   drop?.querySelectorAll("[data-copy]").forEach(btn=>{
     btn.onclick=e=>{
       e.stopPropagation();
@@ -1976,15 +2120,17 @@ function renderProfile(){
     };
   });
 
-  document.getElementById("stat-friends-button")?.addEventListener("click",()=>{
+  const friendsButton=document.getElementById("stat-friends-button");
+  if(friendsButton) friendsButton.onclick=()=>{
     const panel=document.getElementById("my-friends-panel");
     panel?.classList.toggle("hidden");
     if(panel && !panel.classList.contains("hidden")) renderFriendsPanel({
       ownerUid:currentUser.uid, data:userProfile, listId:"my-friends-list",
       searchId:"my-friends-search", paginationId:"my-friends-pagination", canRemove:true
     });
-  });
-  document.getElementById("close-my-friends")?.addEventListener("click",()=>document.getElementById("my-friends-panel")?.classList.add("hidden"));
+  };
+  const closeFriendsButton=document.getElementById("close-my-friends");
+  if(closeFriendsButton) closeFriendsButton.onclick=()=>document.getElementById("my-friends-panel")?.classList.add("hidden");
 }
 
 async function renderFriendsPanel(opts){
@@ -2166,8 +2312,8 @@ async function renderPublicProfile(uid){
     const isFollowing=userProfile&&(userProfile.following||[]).includes(uid);
     const hideFriends=!!d.hideFriends;
     const friendsCount=(d.friends||[]).length;
-    const banner=d.bannerURL?`<img src="${d.bannerURL}" alt="">`:"";
-    const avatar=d.photoURL?`<img src="${d.photoURL}" alt="">`:getInitials(name);
+    const banner=d.bannerURL?`<img src="${esc(d.bannerURL)}" alt="">`:"";
+    const avatar=d.photoURL?`<img src="${esc(d.photoURL)}" alt="">`:getInitials(name);
 
     let actions="";
     if(currentUser&&!isSelf){
@@ -2266,13 +2412,27 @@ function renderConfig(){
   if(tog){
     tog.classList.toggle("on", !!userProfile.hideFriends);
     tog.onclick=async()=>{
-      userProfile.hideFriends=!userProfile.hideFriends;
-      tog.classList.toggle("on", userProfile.hideFriends);
-      await db.collection("users").doc(currentUser.uid).set({hideFriends:userProfile.hideFriends},{merge:true});
-      showToast(userProfile.hideFriends?"Lista de amigos oculta":"Lista de amigos visível");
+      if(tog.disabled) return;
+      const previous=!!userProfile.hideFriends;
+      const next=!previous;
+      tog.disabled=true;
+      userProfile.hideFriends=next;
+      tog.classList.toggle("on",next);
+      try{
+        await db.collection("users").doc(currentUser.uid).set({hideFriends:next},{merge:true});
+        showToast(next?"Lista de amigos oculta":"Lista de amigos visível");
+      }catch(err){
+        userProfile.hideFriends=previous;
+        tog.classList.toggle("on",previous);
+        showToast("Não foi possível salvar a privacidade. Verifique as regras do Firestore.");
+        console.error("Falha ao atualizar privacidade da lista de amigos:",err);
+      }finally{
+        tog.disabled=false;
+      }
     };
   }
-  document.getElementById("btn-copy-config-id")?.addEventListener("click",()=>copyText(userProfile.accountId||""));
+  const copyIdButton=document.getElementById("btn-copy-config-id");
+  if(copyIdButton) copyIdButton.onclick=()=>copyText(userProfile.accountId||"");
 }
 
 function openEditProfile(){
@@ -2306,6 +2466,14 @@ async function handleEditProfile(e){
       bannerURL:pendingBanner||null,
       links
     });
+
+    // O Firestore limita cada documento a 1 MiB; os limites de imagem acima
+    // deixam margem para os demais dados do perfil e links.
+    const profileBytes=new Blob([JSON.stringify(data)]).size;
+    if(profileBytes > 800 * 1024){
+      throw new Error("O perfil ficou grande demais para o Firestore. Escolha uma imagem menor para foto ou banner.");
+    }
+
     await db.collection("users").doc(currentUser.uid).set(data,{merge:true});
     await currentUser.updateProfile({displayName:name});
     userProfile={...userProfile,...data};
@@ -2316,9 +2484,23 @@ async function handleEditProfile(e){
     renderProfile(); updateUserArea(); renderConfig();
     showToast("Perfil atualizado");
   }catch(err){
-    errEl.textContent=err.message||"Erro ao salvar"; errEl.classList.remove("hidden");
+    const raw=String(err?.message||"");
+    const code=String(err?.code||"");
+    if(/larger than|1.?048.?576|document.*size|exceeds.*size/i.test(raw)){
+      errEl.textContent="O perfil ultrapassou o limite de tamanho do Firestore. Reduza a foto ou o banner e tente novamente.";
+    }else if(code==="permission-denied" || /insufficient permissions/i.test(raw)){
+      errEl.textContent="O Firebase recusou a alteração. Confira se as regras de /users permitem atualizar displayName, bio, photoURL, bannerURL e links.";
+    }else if(code==="unavailable" || /network|offline/i.test(raw)){
+      errEl.textContent="Sem conexão estável com o Firebase. Confira a internet e tente novamente.";
+    }else{
+      errEl.textContent=raw||"Não foi possível salvar o perfil. Tente novamente.";
+    }
+    console.error("Erro ao salvar o perfil:",err);
+    errEl.classList.remove("hidden");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="Salvar";
   }
-  btn.disabled=false; btn.textContent="Salvar";
 }
 
 function closeMobileNav(){
@@ -2405,7 +2587,7 @@ async function searchUsers(qRaw){
   results.innerHTML=list.map(u=>{
     const name=u.displayName||"Usuário";
     const av=u.photoURL
-      ?`<div class="su-av"><img src="${u.photoURL}" alt=""></div>`
+      ?`<div class="su-av"><img src="${esc(u.photoURL)}" alt=""></div>`
       :`<div class="su-av">${esc(getInitials(name))}</div>`;
     const badges=badgeHtmlForRole(roleOfProfile(u));
     const sub=[u.accountId?("ID: "+u.accountId):"", atHandle(u)].filter(Boolean).join(" · ");
@@ -2545,7 +2727,7 @@ async function renderChatList(){
     list.innerHTML=rows.map(r=>{
       const name=r.d.displayName||"Usuário";
       const av=r.d.photoURL
-        ?`<div class="cf-av"><img src="${r.d.photoURL}" alt=""></div>`
+        ?`<div class="cf-av"><img src="${esc(r.d.photoURL)}" alt=""></div>`
         :`<div class="cf-av">${esc(getInitials(name))}</div>`;
       const active=activeChatPeer&&activeChatPeer.uid===r.uid?" active":"";
       return `<div class="chat-friend-row${active}" data-peer="${esc(r.uid)}">
@@ -2581,7 +2763,7 @@ async function openChatWith(peerUid){
     document.getElementById("chat-peer-name").textContent=activeChatPeer.displayName;
     const av=document.getElementById("chat-peer-av");
     if(av){
-      if(activeChatPeer.photoURL) av.innerHTML=`<img src="${activeChatPeer.photoURL}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+      if(activeChatPeer.photoURL) av.innerHTML=`<img src="${esc(activeChatPeer.photoURL)}" alt="" style="width:100%;height:100%;object-fit:cover">`;
       else av.textContent=getInitials(activeChatPeer.displayName);
     }
     document.getElementById("chat-input").disabled=false;
@@ -3137,8 +3319,14 @@ function runCatWebTests(){
   const input=document.getElementById("chat-input");
   const counter=document.getElementById("chat-char-count");
   put("counter",!!input&&!!counter&&input.maxLength===1000,"Campo e contador presentes; limite configurado em 1000 caracteres");
-  const storageLoaded=typeof firebase!=="undefined" && typeof firebase.storage==="function";
-  put("storage",storageLoaded,storageLoaded?"SDK do Firebase Storage carregado":"SDK do Firebase Storage não carregou");
+  const imageProcessingReady=typeof FileReader==="function"
+    && typeof URL!=="undefined"
+    && typeof URL.createObjectURL==="function"
+    && typeof document.createElement("canvas").toDataURL==="function";
+  put("images",imageProcessingReady,
+    imageProcessingReady
+      ?"Imagens podem ser compactadas no navegador sem Firebase Storage"
+      :"Este navegador não oferece os recursos necessários para compactar imagens");
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
