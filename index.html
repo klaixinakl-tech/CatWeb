@@ -2306,6 +2306,8 @@ async function openChatWith(peerUid){
     const snap=await db.collection("users").doc(peerUid).get();
     if(!snap.exists){ showToast("Usuário não encontrado"); return; }
     const d=snap.data();
+    // cria o doc do chat ANTES de abrir a UI
+    await ensureChatDoc(peerUid);
     activeChatPeer={uid:peerUid, displayName:d.displayName||"Usuário", photoURL:d.photoURL||null, accountId:d.accountId||""};
     document.getElementById("chat-peer-name").textContent=activeChatPeer.displayName;
     const av=document.getElementById("chat-peer-av");
@@ -2317,13 +2319,17 @@ async function openChatWith(peerUid){
     document.getElementById("chat-send").disabled=false;
     document.getElementById("chat-list-pane")?.classList.add("hidden-mobile");
     document.getElementById("chat-thread-pane")?.classList.add("open");
-    await ensureChatDoc(peerUid);
     listenChatMessages(peerUid);
-    renderChatList(); // refresh active state
-    location.hash="chat/"+peerUid;
+    renderChatList();
+    if(location.hash!=="#chat/"+peerUid) location.hash="chat/"+peerUid;
   }catch(e){
     console.error(e);
-    showToast("Não foi possível abrir o chat");
+    const code=(e&&e.code)||"";
+    const msg=(e&&e.message)||String(e);
+    if(code.includes("permission")||msg.includes("permission"))
+      showToast("Permissão negada no Firestore (regras de chats). Publique as rules corretas.");
+    else
+      showToast("Chat: "+(msg.slice(0,80)||"erro desconhecido"));
   }
 }
 
