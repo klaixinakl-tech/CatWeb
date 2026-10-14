@@ -2372,22 +2372,35 @@ function listenChatMessages(peerUid){
 
 async function sendChatMessage(e){
   if(e) e.preventDefault();
-  if(!currentUser||!activeChatPeer){
-    showToast("Entre na sua conta e abra uma conversa antes de enviar.");
-    return;
-  }
   const input=document.getElementById("chat-input");
-  const text=(input?.value||"").trim();
-  if(!text) return;
-  if(text.length>CHAT_MAX){ showToast("Máximo 1000 caracteres"); return; }
   const btn=document.getElementById("chat-send");
-  if(btn) btn.disabled=true;
   try{
-    const friends = await areMutualFriends(currentUser.uid, activeChatPeer.uid);
-    if(!friends){
-      showToast("Vocês precisam ser amigos para conversar.");
+    if(!currentUser||!activeChatPeer){
+      showToast("Diagnóstico: conta ou conversa não identificada.");
+      alert("CatWeb diagnóstico: conta ou conversa não identificada. Faça login e abra novamente o chat.");
       return;
     }
+    const text=(input?.value||"").trim();
+    if(!text) return;
+    if(text.length>CHAT_MAX){
+      showToast("Máximo 1000 caracteres");
+      return;
+    }
+    if(btn) btn.disabled=true;
+
+    let friends;
+    try {
+      friends = await areMutualFriends(currentUser.uid, activeChatPeer.uid);
+    } catch (err) {
+      throw new Error("Falha ao verificar amizade: " + (err?.code || "") + " " + (err?.message || String(err)));
+    }
+    if(!friends){
+      const msg="A verificação de amizade retornou falso. Confira se os dois perfis têm o UID um do outro no campo friends.";
+      showToast(msg);
+      alert("CatWeb diagnóstico: " + msg);
+      return;
+    }
+
     const cid=await ensureChatDoc(activeChatPeer.uid);
     await db.collection("chats").doc(cid).collection("messages").add({
       text,
@@ -2400,9 +2413,13 @@ async function sendChatMessage(e){
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true});
     if(input){ input.value=""; updateChatCharCount(); }
+    showToast("Mensagem enviada.");
   }catch(err){
-    console.error("Erro real ao enviar mensagem:", { code: err?.code, message: err?.message, error: err });
-    showToast("Erro: " + (err?.code || "desconhecido") + " — " + (err?.message || "falha ao enviar").slice(0, 100));
+    const code=err?.code || "sem-código";
+    const detail=err?.message || String(err) || "falha desconhecida";
+    console.error("CatWeb diagnóstico de envio:", err);
+    showToast("Erro: " + code + " — " + detail.slice(0,100));
+    alert("CatWeb diagnóstico de envio\\nCódigo: " + code + "\\nDetalhe: " + detail);
   }finally{
     if(btn) btn.disabled=false;
   }
