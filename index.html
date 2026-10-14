@@ -620,6 +620,7 @@ body{
         <a href="#moderacao" class="nav-link" data-nav="moderacao" id="nav-moderacao" style="display:none">Moderação</a>
         <a href="#perfil" class="nav-link" data-nav="perfil">Perfil</a>
         <a href="#config" class="nav-link" data-nav="config">Config</a>
+        <a href="#teste" class="nav-link" data-nav="teste">Teste</a>
       </nav>
       <div class="user-area" id="user-area">
         <button class="btn-icon" id="theme-toggle" title="Tema">🌙</button>
@@ -643,6 +644,7 @@ body{
       <a href="#moderacao" class="nav-link" data-nav="moderacao" id="nav-moderacao-m" style="display:none">🛡️ · Moderação</a>
       <a href="#perfil" class="nav-link" data-nav="perfil">👤 · Perfil</a>
       <a href="#config" class="nav-link" data-nav="config">⚙️ · Config</a>
+      <a href="#teste" class="nav-link" data-nav="teste">🧪 · Teste</a>
     </nav>
     <div class="nav-drawer-footer">✦ CatWeb ✦</div>
   </aside>
@@ -881,6 +883,30 @@ body{
       </div>
     </div>
 
+
+    <!-- ABA TESTE: marca visível desta versão para confirmar publicação -->
+    <div id="view-teste" class="view">
+      <div class="container">
+        <div class="placeholder-card" style="text-align:left">
+          <h2>🧪 Aba de teste do CatWeb</h2>
+          <p>Esta aba foi adicionada numa alteração nova do arquivo. Se você está vendo esta tela no GitHub Pages, a versão com a aba de teste foi publicada.</p>
+          <div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin:14px 0">
+            <div style="font-weight:700">Identificação da versão</div>
+            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-TEST-TAB-2026-10-14-A</div>
+            <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Aba Teste adicionada + inicialização explícita dos controles do chat.</div>
+          </div>
+          <h3 style="margin:14px 0 8px">Verificações locais</h3>
+          <div id="test-checks" style="display:grid;gap:8px">
+            <div data-test="dom">⏳ Estrutura da página</div>
+            <div data-test="chat">⏳ Elementos do chat</div>
+            <div data-test="auth">⏳ Estado de autenticação</div>
+            <div data-test="counter">⏳ Contador de caracteres</div>
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-run-tests" style="margin-top:14px">Executar testes novamente</button>
+          <p style="font-size:.85rem;color:var(--muted);margin-top:12px">As verificações não enviam mensagens nem alteram dados do Firebase.</p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer class="footer">
@@ -2474,7 +2500,7 @@ function router(){
     return;
   }
   stopChatListener();
-  const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config"];
+  const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config","teste"];
   if(pages.includes(page)){
     showView(page);
     if(page==="perfil") renderProfile();
@@ -2488,12 +2514,28 @@ function router(){
   } else showView("feed");
 }
 
+function runCatWebTests(){
+  const put=(key,ok,message)=>{
+    const el=document.querySelector(`[data-test="${key}"]`);
+    if(el) el.textContent=(ok?"✅ ":"❌ ")+message;
+  };
+  put("dom",!!document.getElementById("view-teste"),"Aba de teste carregada");
+  const chatReady=!!document.getElementById("chat-form")&&!!document.getElementById("chat-input")&&!!document.getElementById("chat-send");
+  put("chat",chatReady,"Elementos principais do chat encontrados");
+  const authenticated=typeof currentUser!=="undefined" && !!currentUser;
+  put("auth",authenticated,authenticated?"Usuário autenticado nesta página":"Nenhum usuário autenticado detectado nesta página");
+  const input=document.getElementById("chat-input");
+  const counter=document.getElementById("chat-char-count");
+  put("counter",!!input&&!!counter&&input.maxLength===1000,"Campo e contador presentes; limite configurado em 1000 caracteres");
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
-  // Inicializa os eventos do chat junto com o restante da interface.
-  setupChatUI();
   const theme=localStorage.getItem(THEME_KEY)||"light";
   document.documentElement.setAttribute("data-theme",theme);
   updateUserArea();
+  setupChatUI();
+  document.getElementById("btn-run-tests")?.addEventListener("click",runCatWebTests);
+  runCatWebTests();
   router();
   window.addEventListener("hashchange",router);
   document.addEventListener("click",()=>{
