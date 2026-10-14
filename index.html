@@ -2186,16 +2186,15 @@ function stopChatListener(){
 
 async function areMutualFriends(uidA, uidB){
   if(!uidA||!uidB||uidA===uidB) return false;
-  try{
-    const [a,b] = await Promise.all([
-      db.collection("users").doc(uidA).get(),
-      db.collection("users").doc(uidB).get()
-    ]);
-    if(!a.exists||!b.exists) return false;
-    const fa=a.data().friends||[];
-    const fb=b.data().friends||[];
-    return fa.includes(uidB) && fb.includes(uidA);
-  }catch{ return false; }
+  // Não esconder erros de permissão: o envio precisa exibir a causa real.
+  const [a,b] = await Promise.all([
+    db.collection("users").doc(uidA).get(),
+    db.collection("users").doc(uidB).get()
+  ]);
+  if(!a.exists||!b.exists) return false;
+  const fa=a.data().friends||[];
+  const fb=b.data().friends||[];
+  return fa.includes(uidB) && fb.includes(uidA);
 }
 
 async function ensureChatDoc(peerUid){
@@ -2373,18 +2372,22 @@ function listenChatMessages(peerUid){
 
 async function sendChatMessage(e){
   if(e) e.preventDefault();
-  if(!currentUser||!activeChatPeer) return;
-  const input=document.getElementById("chat-input");
-  let text=(input?.value||"").trim();
-  if(!text) return;
-  if(text.length>CHAT_MAX){ showToast("Máximo 1000 caracteres"); return; }
-  if(!(await areMutualFriends(currentUser.uid, activeChatPeer.uid))){
-    showToast("Vocês precisam ser amigos");
+  if(!currentUser||!activeChatPeer){
+    showToast("Entre na sua conta e abra uma conversa antes de enviar.");
     return;
   }
+  const input=document.getElementById("chat-input");
+  const text=(input?.value||"").trim();
+  if(!text) return;
+  if(text.length>CHAT_MAX){ showToast("Máximo 1000 caracteres"); return; }
   const btn=document.getElementById("chat-send");
   if(btn) btn.disabled=true;
   try{
+    const friends = await areMutualFriends(currentUser.uid, activeChatPeer.uid);
+    if(!friends){
+      showToast("Vocês precisam ser amigos para conversar.");
+      return;
+    }
     const cid=await ensureChatDoc(activeChatPeer.uid);
     await db.collection("chats").doc(cid).collection("messages").add({
       text,
