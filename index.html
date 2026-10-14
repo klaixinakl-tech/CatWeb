@@ -473,6 +473,16 @@ body{
 }
 .profile-stats strong{color:var(--ink);font-size:1.05rem}
 .profile-stats span{color:var(--muted)}
+.stat-link{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.stat-link:hover strong,.stat-link:hover span{color:var(--accent)}
+.friends-panel{margin-top:14px;padding:14px;background:var(--paper);border:1px solid var(--border);border-radius:14px}
+.friends-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:var(--ink);font-family:var(--font-ui)}
+.friends-search{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);font: .9rem var(--font-ui);margin-bottom:12px;outline:none}
+.friends-search:focus{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 18%,transparent)}
+.friends-pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.friends-pagination button{border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 11px;cursor:pointer}
+.friends-pagination button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.friends-private{padding:18px 10px;text-align:center;color:var(--muted);font: .9rem/1.5 var(--font-ui)}
 .profile-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .menu-dots{
   background:transparent;border:1px solid var(--border);width:36px;height:36px;
@@ -798,60 +808,6 @@ h1,h2,h3,.section-title,.view-title {
 .notification-topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .notification-topline button{background:none;border:0;color:#b89b78;cursor:pointer;font-size:.8rem}
 @media(max-width:600px){.feed-heading{padding-top:22px}.composer-card,.feed-post-card{padding:14px}.feed-tab{padding:12px 13px}.post-actions{gap:2px}.post-action{padding:7px 8px}.comment-form{align-items:stretch}.comment-form button{padding:9px}}
-
-/* Correção de contraste do tema claro: mantém o visual Nocturne sem texto quase branco */
-:root, [data-theme="light"] {
-  --text: #302632;
-  --muted: #665966;
-  --feed-input: #f8f4f8;
-  --feed-subcard: #f4eef4;
-  --feed-hover: rgba(111,59,89,.08);
-}
-[data-theme="dark"] {
-  --text: #eee6f0;
-  --muted: #b3a4b8;
-  --feed-input: rgba(0,0,0,.18);
-  --feed-subcard: rgba(0,0,0,.16);
-  --feed-hover: rgba(184,155,120,.08);
-}
-.feed-heading h1,
-.feed-tab.active,
-.composer-intro strong,
-.post-author,
-.comment-meta strong,
-.post-original-head strong,
-.notification-copy,
-.post-body,
-.comment-body,
-.post-original-text,
-.feed-load-more { color: var(--text); }
-.feed-heading>p:last-child,
-.composer-intro span,
-.post-handle,
-.post-time,
-.comment-meta span,
-.feed-status,
-#post-char-count,
-.composer-login-note { color: var(--muted); }
-#post-composer-text,
-.comment-input { background: var(--feed-input); color: var(--text); }
-#post-composer-text::placeholder,
-.comment-input::placeholder { color: var(--muted); opacity:.85; }
-.post-original-card { background: var(--feed-subcard); }
-.comment-item { background: var(--feed-hover); }
-.post-action { color: var(--muted); }
-.post-action:hover { color: var(--text); background: var(--feed-hover); }
-.feed-mention { color: #70415d; background: rgba(111,59,89,.10); }
-[data-theme="dark"] .feed-mention { color:#d6b78b; background:rgba(184,155,120,.10); }
-[data-theme="light"] .feed-tab:not(.active) { color:#665966; }
-[data-theme="light"] .feed-tab.active { color:#4f2942; }
-[data-theme="light"] .post-repost-note,
-[data-theme="light"] .comment-actions button,
-[data-theme="light"] .comment-reply,
-[data-theme="light"] .notification-icon,
-[data-theme="light"] .notification-topline button { color:#70415d; }
-[data-theme="light"] .post-action.is-liked,
-[data-theme="light"] .comment-actions button.is-liked { color:#9b416d; }
   </style>
 </head>
 <body>
@@ -1094,17 +1050,19 @@ h1,h2,h3,.section-title,.view-title {
               <div class="profile-bio" id="profile-bio-el">Sem bio ainda.</div>
               <div class="profile-links" id="profile-links-el"></div>
               <div class="profile-stats">
-                <div><strong id="stat-friends">0</strong> <span>amigos</span></div>
+                <button type="button" class="stat-link" id="stat-friends-button"><strong id="stat-friends">0</strong> <span>amigos</span></button>
                 <div><strong id="stat-followers">0</strong> <span>seguidores</span></div>
                 <div><strong id="stat-following">0</strong> <span>seguindo</span></div>
+              </div>
+              <div class="friends-panel hidden" id="my-friends-panel">
+                <div class="friends-panel-head"><strong>Lista de amizades</strong><button type="button" class="menu-dots" id="close-my-friends" aria-label="Fechar lista">×</button></div>
+                <input id="my-friends-search" class="friends-search" type="search" placeholder="Pesquisar por @ ou ID..." autocomplete="off">
+                <div id="my-friends-list"></div>
+                <div id="my-friends-pagination" class="friends-pagination"></div>
               </div>
               <div class="profile-actions">
                 <button class="btn btn-primary btn-sm" id="btn-edit-profile">✏️ Editar perfil</button>
                 <a href="#config" class="btn btn-secondary btn-sm">⚙️ Configurações</a>
-              </div>
-              <div class="friends-section" id="friends-section">
-                <h3>💜 Amigos</h3>
-                <div id="my-friends-list"></div>
               </div>
             </div>
           </div>
@@ -1129,7 +1087,7 @@ h1,h2,h3,.section-title,.view-title {
             <div class="settings-row">
               <div>
                 <strong>Ocultar lista de amigos</strong>
-                <div class="form-hint">Outros não verão quem está na sua lista de amigos</div>
+                <div class="form-hint">Ativado: a lista fica privada. Desativado: pessoas que abrirem seu perfil podem ver suas amizades.</div>
               </div>
               <button type="button" class="toggle" id="toggle-hide-friends" aria-label="Ocultar amigos"></button>
             </div>
@@ -2012,54 +1970,53 @@ function renderProfile(){
     };
   });
 
-  renderMyFriends();
+  document.getElementById("stat-friends-button")?.addEventListener("click",()=>{
+    const panel=document.getElementById("my-friends-panel");
+    panel?.classList.toggle("hidden");
+    if(panel && !panel.classList.contains("hidden")) renderFriendsPanel({
+      ownerUid:currentUser.uid, data:userProfile, listId:"my-friends-list",
+      searchId:"my-friends-search", paginationId:"my-friends-pagination", canRemove:true
+    });
+  });
+  document.getElementById("close-my-friends")?.addEventListener("click",()=>document.getElementById("my-friends-panel")?.classList.add("hidden"));
 }
 
-async function renderMyFriends(){
-  const list=document.getElementById("my-friends-list");
-  if(!list||!userProfile) return;
-  const friends=userProfile.friends||[];
-  if(!friends.length){
-    list.innerHTML=`<p style="font-size:.85rem;color:var(--muted);font-family:var(--font-ui)">Nenhum amigo ainda.</p>`;
-    return;
+async function renderFriendsPanel(opts){
+  const {ownerUid,data,listId,searchId,paginationId,canRemove=false}=opts;
+  const list=document.getElementById(listId), search=document.getElementById(searchId), pager=document.getElementById(paginationId);
+  if(!list||!data) return;
+  if(data.hideFriends && ownerUid!==currentUser?.uid){
+    list.innerHTML='<div class="friends-private">Esta lista de amizades é privada.</div>'; if(search) search.classList.add("hidden"); if(pager) pager.innerHTML=""; return;
   }
-  list.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">Carregando...</p>`;
+  if(search) search.classList.remove("hidden");
+  const ids=Array.isArray(data.friends)?data.friends:[];
+  if(!ids.length){list.innerHTML='<div class="friends-private">Nenhuma amizade por enquanto.</div>'; if(pager) pager.innerHTML="";return;}
+  list.innerHTML='<div class="friends-private">Carregando amizades…</div>';
   try{
-    let html="";
-    for(let i=0;i<friends.length;i+=10){
-      const chunk=friends.slice(i,i+10);
-      const snaps=await Promise.all(chunk.map(id=>db.collection("users").doc(id).get()));
-      snaps.forEach(snap=>{
-        if(!snap.exists) return;
-        const d=snap.data();
-        const name=d.displayName||"Usuário";
-        const av=d.photoURL?`<img src="${d.photoURL}" alt="">`:`<div class="friend-av">${getInitials(name)}</div>`;
-        html+=`<div class="friend-row" data-uid="${snap.id}">
-          ${av}
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;font-size:.9rem">${esc(name)}</div>
-            <div style="font-size:.75rem;color:var(--muted)">${esc(d.accountId||"")}</div>
-          </div>
-          <button class="btn btn-secondary btn-sm" data-unfriend="${snap.id}">Remover</button>
-        </div>`;
-      });
+    const users=[];
+    for(let i=0;i<ids.length;i+=10){
+      const snaps=await Promise.all(ids.slice(i,i+10).map(id=>db.collection("users").doc(id).get()));
+      snaps.forEach(s=>{if(s.exists) users.push({uid:s.id,...s.data()});});
     }
-    list.innerHTML=html||`<p style="font-size:.85rem;color:var(--muted)">Nenhum amigo.</p>`;
-    list.querySelectorAll(".friend-row").forEach(row=>{
-      row.addEventListener("click",e=>{
-        if(e.target.closest("[data-unfriend]")) return;
-        location.hash="user/"+row.dataset.uid;
-      });
-    });
-    list.querySelectorAll("[data-unfriend]").forEach(btn=>{
-      btn.addEventListener("click",async e=>{
-        e.stopPropagation();
-        await removeFriend(btn.dataset.unfriend);
-      });
-    });
-  }catch(e){
-    list.innerHTML=`<p style="color:#c62828;font-size:.85rem">Erro ao carregar amigos</p>`;
-  }
+    let page=1;
+    const paint=()=>{
+      const q=(search?.value||"").trim().toLowerCase().replace(/^@/,"");
+      const filtered=users.filter(u=>`${u.displayName||""} ${u.accountId||""} ${atHandle(u)||""}`.toLowerCase().includes(q));
+      const pages=Math.max(1,Math.ceil(filtered.length/10)); page=Math.min(page,pages);
+      const current=filtered.slice((page-1)*10,page*10);
+      list.innerHTML=current.map(u=>{
+        const name=u.displayName||"Usuário";
+        const av=u.photoURL?`<img src="${esc(u.photoURL)}" alt="">`:`<div class="friend-av">${esc(getInitials(name))}</div>`;
+        return `<div class="friend-row" data-uid="${esc(u.uid)}">${av}<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.9rem">${esc(name)}</div><div style="font-size:.75rem;color:var(--muted)">@${esc(u.accountId||"")}</div></div>${canRemove?`<button class="btn btn-secondary btn-sm" data-unfriend="${esc(u.uid)}">Remover</button>`:""}</div>`;
+      }).join("") || '<div class="friends-private">Nenhum resultado encontrado.</div>';
+      if(pager) pager.innerHTML=pages>1?`<button type="button" data-page="${page-1}" ${page===1?"disabled":""}>Anterior</button>${Array.from({length:pages},(_,i)=>`<button type="button" class="${page===i+1?"active":""}" data-page="${i+1}">${i+1}</button>`).join("")}<button type="button" data-page="${page+1}" ${page===pages?"disabled":""}>Próxima</button>`:"";
+      list.querySelectorAll(".friend-row").forEach(row=>row.addEventListener("click",e=>{if(e.target.closest("[data-unfriend]"))return;location.hash="user/"+row.dataset.uid;}));
+      list.querySelectorAll("[data-unfriend]").forEach(btn=>btn.addEventListener("click",async e=>{e.stopPropagation();await removeFriend(btn.dataset.unfriend);renderFriendsPanel(opts);}));
+      pager?.querySelectorAll("[data-page]").forEach(btn=>btn.addEventListener("click",()=>{const n=Number(btn.dataset.page);if(n>=1&&n<=pages){page=n;paint();}}));
+    };
+    if(search){search.value="";search.oninput=()=>{page=1;paint();};}
+    paint();
+  }catch(e){list.innerHTML='<div class="friends-private">Não foi possível carregar a lista de amizades.</div>';}
 }
 
 async function removeFriend(uid){
@@ -2240,15 +2197,17 @@ async function renderPublicProfile(uid){
           <div class="profile-bio" id="pub-bio-el"></div>
           <div class="profile-links" id="pub-links-el"></div>
           <div class="profile-stats">
-            <div><strong>${friendsCount}</strong> <span>amigos</span></div>
+            <button type="button" class="stat-link" id="pub-stat-friends"><strong>${friendsCount}</strong> <span>amigos</span></button>
             <div><strong>${d.followersCount||0}</strong> <span>seguidores</span></div>
             <div><strong>${(d.following||[]).length}</strong> <span>seguindo</span></div>
           </div>
-          <div class="profile-actions">${actions}</div>
-          <div class="friends-section">
-            <h3>💜 Amigos</h3>
-            <p style="font-size:.85rem;color:var(--muted);font-family:var(--font-ui)">${hideFriends?"Lista de amigos oculta (privacidade).":"Listas de quem a pessoa segue não são públicas — só a contagem acima. Amigos: "+friendsCount+"."}</p>
+          <div class="friends-panel hidden" id="pub-friends-panel">
+            <div class="friends-panel-head"><strong>Lista de amizades</strong><button type="button" class="menu-dots" id="close-pub-friends" aria-label="Fechar lista">×</button></div>
+            <input id="pub-friends-search" class="friends-search" type="search" placeholder="Pesquisar por @ ou ID..." autocomplete="off">
+            <div id="pub-friends-list"></div>
+            <div id="pub-friends-pagination" class="friends-pagination"></div>
           </div>
+          <div class="profile-actions">${actions}</div>
         </div>
       </div>`;
     if(!d.bannerURL){
@@ -2276,6 +2235,12 @@ async function renderPublicProfile(uid){
     document.getElementById("pub-chat")?.addEventListener("click",()=>{ location.hash="chat/"+uid; });
     document.getElementById("pub-follow")?.addEventListener("click",()=>followUser(uid));
     document.getElementById("pub-unfollow")?.addEventListener("click",()=>unfollowUser(uid));
+    document.getElementById("pub-stat-friends")?.addEventListener("click",()=>{
+      const panel=document.getElementById("pub-friends-panel");
+      panel?.classList.toggle("hidden");
+      if(panel && !panel.classList.contains("hidden")) renderFriendsPanel({ownerUid:uid,data:d,listId:"pub-friends-list",searchId:"pub-friends-search",paginationId:"pub-friends-pagination"});
+    });
+    document.getElementById("close-pub-friends")?.addEventListener("click",()=>document.getElementById("pub-friends-panel")?.classList.add("hidden"));
   }catch(e){
     el.innerHTML=`<div class="placeholder-card"><p style="color:#c62828">Erro: ${esc(e.message||"")}</p></div>`;
   }
