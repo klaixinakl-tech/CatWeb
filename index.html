@@ -758,6 +758,14 @@ h1,h2,h3,.section-title,.view-title {
 .post-comments{margin-top:13px;padding-top:13px;border-top:1px solid var(--border,rgba(190,160,190,.18))}
 .comment-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .comment-item{padding:10px 12px;border-left:2px solid rgba(184,155,120,.48);background:rgba(130,100,140,.055);border-radius:0 7px 7px 0}
+.comment-topline{display:flex;align-items:flex-start;gap:9px}
+.comment-topline .feed-avatar{width:32px;height:32px;min-width:32px;font-size:.68rem}
+.comment-content{min-width:0;flex:1}
+.comment-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.comment-actions button{margin-top:6px;padding:3px 0;background:none;border:0;color:#b89b78;font-size:.74rem;cursor:pointer}
+.comment-actions button.is-liked{color:#d39ab5}
+.post-repost-commentary:empty{display:none}
+
 .comment-meta{display:flex;flex-wrap:wrap;gap:7px;align-items:baseline;margin-bottom:4px}
 .comment-meta strong{font-size:.8rem;color:var(--text,#eee5ee)}
 .comment-meta span{font-size:.72rem;color:var(--muted,#a89ba9)}
@@ -2720,10 +2728,22 @@ function feedTextHtml(text){
   return safe.replace(/@((?:FW|CW)-[A-Za-z0-9]{4,12})/gi,(match,id)=>`<a href="#" class="feed-mention" data-mention-id="${esc(normalizeAccountId(id))}">@${esc(id.toUpperCase())}</a>`).replace(/\n/g,"<br>");
 }
 function bindFeedMentions(root){
-  root.querySelectorAll(".feed-mention[data-mention-id]").forEach(a=>a.addEventListener("click",async e=>{
-    e.preventDefault();e.stopPropagation();const id=a.dataset.mentionId;const info=await resolveAccountId(id);
-    if(info)location.hash="user/"+info.uid;else showToast("Conta @"+id+" não encontrada.");
-  }));
+  root.querySelectorAll(".feed-mention[data-mention-id]").forEach(async a=>{
+    const id=a.dataset.mentionId;
+    // Exibe o nome público, mas conserva o código como identificador clicável.
+    try{
+      const info=await resolveAccountId(id);
+      if(info){
+        const label=info.displayName||info.name||info.user?.displayName||info.profile?.displayName;
+        if(label)a.textContent="@"+label;
+      }
+    }catch(e){console.warn("Não foi possível resolver menção:",e);}
+    a.addEventListener("click",async e=>{
+      e.preventDefault();e.stopPropagation();
+      const info=await resolveAccountId(id);
+      if(info)location.hash="user/"+info.uid;else showToast("Conta @"+id+" não encontrada.");
+    });
+  });
 }
 async function sendFeedNotification(recipientUid,type,post,extra={}){
   if(!currentUser||!recipientUid||recipientUid===currentUser.uid)return;
@@ -2922,7 +2942,7 @@ async function loadOriginalRepost(post,card){
     const original={id:snap.id,...snap.data()};const name=feedAuthorName(original);
     box.innerHTML=`<div class="post-original-head">${feedAvatarHtml(original.authorPhotoURL||original.photoURL,name)}<span><strong>${esc(name)}</strong> ${original.authorAccountId?`· @${esc(original.authorAccountId)}`:""} · ${esc(feedTime(original.createdAt))}</span></div><div class="post-original-text">${feedTextHtml(original.text||"")}</div>`;
     bindFeedMentions(box);
-    const open=()=>{const target=document.querySelector(`[data-post-id="${CSS.escape(original.id)}"]`);if(target)target.scrollIntoView({behavior:"smooth",block:"center"});else{location.hash="feed";showToast("A publicação original está no feed.");}};
+    const open=()=>{const target=document.querySelector(`[data-post-id="${CSS.escape(original.id)}"]`);if(target)target.scrollIntoView({behavior:"smooth",block:"center"});else{location.hash="feed";setTimeout(()=>{const found=document.querySelector(`[data-post-id="${CSS.escape(original.id)}"]`);if(found)found.scrollIntoView({behavior:"smooth",block:"center"});else showToast("A publicação original não está nesta página do feed.");},450);}};
     box.addEventListener("click",open);box.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
   }catch(e){console.warn("Não foi possível carregar o repost original:",e);box.innerHTML='<div class="post-original-text">Não foi possível carregar a publicação original.</div>';}
 }
@@ -2972,13 +2992,35 @@ async function loadPostComments(post,card){
 }
 function commentElement(comment,post,card){
   const el=document.createElement("div");el.className="comment-item";
-  el.innerHTML=`<div class="comment-meta"><a class="comment-author-link" href="#user/${esc(comment.authorId||"")}"><strong>${esc(comment.authorName||"Usuário")}</strong></a><span>${comment.authorAccountId?`@${esc(comment.authorAccountId)} · `:""}${esc(feedTime(comment.createdAt))}</span></div><div class="comment-body">${feedTextHtml(comment.text||"")}</div><button type="button" class="comment-reply" data-reply-id="${esc(comment.id)}" data-reply-name="${esc(comment.authorName||"usuário")}">Responder</button>`;
+  const author=comment.authorName||"Usuário";
+  el.innerHTML=`<div class="comment-topline">${feedAvatarHtml(comment.authorPhotoURL||comment.photoURL,author)}<div class="comment-content"><div class="comment-meta"><a class="comment-author-link" href="#user/${esc(comment.authorId||"")}"><strong>${esc(author)}</strong></a><span>${comment.authorAccountId?`@${esc(comment.authorAccountId)} · `:""}${esc(feedTime(comment.createdAt))}</span></div><div class="comment-body">${feedTextHtml(comment.text||"")}</div><div class="comment-actions"><button type="button" class="comment-reply" data-reply-id="${esc(comment.id)}" data-reply-name="${esc(author)}">Responder</button><button type="button" class="comment-like" aria-label="Curtir resposta">♡ Curtir</button><button type="button" class="comment-repost" aria-label="Repostar resposta">⤴ Repostar</button></div></div></div>`;
   bindFeedMentions(el);
   el.querySelector(".comment-reply")?.addEventListener("click",()=>{
     if(!currentUser){showToast("Entre na sua conta para responder.");return;}
-    feedReplyTargets[post.id]={id:comment.id,name:comment.authorName||"usuário"};
-    const note=card.querySelector(".comment-replying");if(note){note.textContent=`Respondendo a ${comment.authorName||"usuário"} — cancelar`;note.classList.remove("hidden");note.onclick=()=>{delete feedReplyTargets[post.id];note.classList.add("hidden");};note.style.cursor="pointer";}
+    feedReplyTargets[post.id]={id:comment.id,name:author};
+    const note=card.querySelector(".comment-replying");if(note){note.textContent=`Respondendo a ${author} — cancelar`;note.classList.remove("hidden");note.onclick=()=>{delete feedReplyTargets[post.id];note.classList.add("hidden");};note.style.cursor="pointer";}
     card.querySelector(".comment-input")?.focus();
+  });
+  el.querySelector(".comment-like")?.addEventListener("click",async()=>{
+    if(!currentUser){showToast("Entre na sua conta para curtir.");return;}
+    const btn=el.querySelector(".comment-like");
+    try{
+      const ref=db.collection("posts").doc(post.id).collection("comments").doc(comment.id).collection("likes").doc(currentUser.uid);
+      const snap=await ref.get();
+      if(snap.exists){await ref.delete();btn.classList.remove("is-liked");btn.textContent="♡ Curtir";}
+      else{await ref.set({uid:currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});btn.classList.add("is-liked");btn.textContent="♥ Curtido";}
+    }catch(err){console.error(err);showToast("Não foi possível curtir. As regras do Firestore podem precisar de ajuste.");}
+  });
+  el.querySelector(".comment-repost")?.addEventListener("click",async()=>{
+    if(!currentUser){showToast("Entre na sua conta para repostar.");return;}
+    try{
+      const ref=db.collection("posts").doc();
+      const nameNow=userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0];
+      const batch=db.batch();
+      batch.set(ref,{text:comment.text||"",commentary:"",authorId:currentUser.uid,authorName:nameNow,authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,type:"repost",repostOf:post.id,originalAuthorId:comment.authorId||post.authorId,originalAuthorName:author,createdAt:firebase.firestore.FieldValue.serverTimestamp(),likesCount:0,commentsCount:0,repostsCount:0,quotedCommentId:comment.id});
+      batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1)});
+      await batch.commit();showToast("Resposta repostada.");resetFeed();
+    }catch(err){console.error(err);showToast("Não foi possível repostar essa resposta. Confira as regras do Firestore.");}
   });
   return el;
 }
@@ -2990,7 +3032,7 @@ async function createPostComment(e,post,card){
   btn.disabled=true;
   try{
     const target=feedReplyTargets[post.id];
-    const comment={text,authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",parentId:target?.id||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    const comment={text,authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,parentId:target?.id||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
     const commentRef=await db.collection("posts").doc(post.id).collection("comments").add(comment);
     await db.collection("posts").doc(post.id).update({commentsCount:firebase.firestore.FieldValue.increment(1)});
     const notificationPost={...post,id:post.id};
@@ -3012,7 +3054,8 @@ async function repostPost(post){
   try{
     const ref=db.collection("posts").doc();
     const batch=db.batch();
-    batch.set(ref,{text:post.text||"",authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,type:"repost",repostOf:post.id,originalAuthorId:post.authorId,originalAuthorName:feedAuthorName(post),createdAt:firebase.firestore.FieldValue.serverTimestamp(),likesCount:0,commentsCount:0,repostsCount:0});
+    const commentary=(prompt("Escreva algo sobre esta publicação (opcional):","")||"").trim();
+    batch.set(ref,{text:post.text||"",commentary,authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,type:"repost",repostOf:post.id,originalAuthorId:post.authorId,originalAuthorName:feedAuthorName(post),createdAt:firebase.firestore.FieldValue.serverTimestamp(),likesCount:0,commentsCount:0,repostsCount:0});
     batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1)});
     await batch.commit();await sendFeedNotification(post.authorId,"repost",post,{});showToast("Publicação repostada.");resetFeed();
   }catch(err){console.error("Falha ao repostar:",err);showToast(err?.code==="permission-denied"?"As regras do Firestore precisam permitir reposts.":"Não foi possível repostar.");}
