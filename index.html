@@ -798,6 +798,60 @@ h1,h2,h3,.section-title,.view-title {
 .notification-topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .notification-topline button{background:none;border:0;color:#b89b78;cursor:pointer;font-size:.8rem}
 @media(max-width:600px){.feed-heading{padding-top:22px}.composer-card,.feed-post-card{padding:14px}.feed-tab{padding:12px 13px}.post-actions{gap:2px}.post-action{padding:7px 8px}.comment-form{align-items:stretch}.comment-form button{padding:9px}}
+
+/* Correção de contraste do tema claro: mantém o visual Nocturne sem texto quase branco */
+:root, [data-theme="light"] {
+  --text: #302632;
+  --muted: #665966;
+  --feed-input: #f8f4f8;
+  --feed-subcard: #f4eef4;
+  --feed-hover: rgba(111,59,89,.08);
+}
+[data-theme="dark"] {
+  --text: #eee6f0;
+  --muted: #b3a4b8;
+  --feed-input: rgba(0,0,0,.18);
+  --feed-subcard: rgba(0,0,0,.16);
+  --feed-hover: rgba(184,155,120,.08);
+}
+.feed-heading h1,
+.feed-tab.active,
+.composer-intro strong,
+.post-author,
+.comment-meta strong,
+.post-original-head strong,
+.notification-copy,
+.post-body,
+.comment-body,
+.post-original-text,
+.feed-load-more { color: var(--text); }
+.feed-heading>p:last-child,
+.composer-intro span,
+.post-handle,
+.post-time,
+.comment-meta span,
+.feed-status,
+#post-char-count,
+.composer-login-note { color: var(--muted); }
+#post-composer-text,
+.comment-input { background: var(--feed-input); color: var(--text); }
+#post-composer-text::placeholder,
+.comment-input::placeholder { color: var(--muted); opacity:.85; }
+.post-original-card { background: var(--feed-subcard); }
+.comment-item { background: var(--feed-hover); }
+.post-action { color: var(--muted); }
+.post-action:hover { color: var(--text); background: var(--feed-hover); }
+.feed-mention { color: #70415d; background: rgba(111,59,89,.10); }
+[data-theme="dark"] .feed-mention { color:#d6b78b; background:rgba(184,155,120,.10); }
+[data-theme="light"] .feed-tab:not(.active) { color:#665966; }
+[data-theme="light"] .feed-tab.active { color:#4f2942; }
+[data-theme="light"] .post-repost-note,
+[data-theme="light"] .comment-actions button,
+[data-theme="light"] .comment-reply,
+[data-theme="light"] .notification-icon,
+[data-theme="light"] .notification-topline button { color:#70415d; }
+[data-theme="light"] .post-action.is-liked,
+[data-theme="light"] .comment-actions button.is-liked { color:#9b416d; }
   </style>
 </head>
 <body>
