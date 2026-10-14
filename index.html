@@ -893,8 +893,8 @@ body{
           <p>Esta aba foi adicionada numa alteração nova do arquivo. Se você está vendo esta tela no GitHub Pages, a versão com a aba de teste foi publicada.</p>
           <div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin:14px 0">
             <div style="font-weight:700">Identificação da versão</div>
-            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-TEST-TAB-2026-10-14-A</div>
-            <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Aba Teste adicionada + inicialização explícita dos controles do chat.</div>
+            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-GIF-STORAGE-FIX-2026-10-14-B</div>
+            <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Correção de upload de imagens para Firebase Storage + teste de versão B.</div>
           </div>
           <h3 style="margin:14px 0 8px">Verificações locais</h3>
           <div id="test-checks" style="display:grid;gap:8px">
@@ -902,6 +902,7 @@ body{
             <div data-test="chat">⏳ Elementos do chat</div>
             <div data-test="auth">⏳ Estado de autenticação</div>
             <div data-test="counter">⏳ Contador de caracteres</div>
+            <div data-test="storage">⏳ Firebase Storage</div>
           </div>
           <button type="button" class="btn btn-primary" id="btn-run-tests" style="margin-top:14px">Executar testes novamente</button>
           <p style="font-size:.85rem;color:var(--muted);margin-top:12px">As verificações não enviam mensagens nem alteram dados do Firebase.</p>
@@ -2520,6 +2521,8 @@ function runCatWebTests(){
   const input=document.getElementById("chat-input");
   const counter=document.getElementById("chat-char-count");
   put("counter",!!input&&!!counter&&input.maxLength===1000,"Campo e contador presentes; limite configurado em 1000 caracteres");
+  const storageLoaded=typeof firebase!=="undefined" && typeof firebase.storage==="function";
+  put("storage",storageLoaded,storageLoaded?"SDK do Firebase Storage carregado":"SDK do Firebase Storage não carregou");
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
