@@ -893,8 +893,8 @@ body{
           <p>Esta aba foi adicionada numa alteração nova do arquivo. Se você está vendo esta tela no GitHub Pages, a versão com a aba de teste foi publicada.</p>
           <div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin:14px 0">
             <div style="font-weight:700">Identificação da versão</div>
-            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-GIF-STORAGE-FIX-2026-10-14-B</div>
-            <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Correção de upload de imagens para Firebase Storage + teste de versão B.</div>
+            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-GIF-PREVIEW-STORAGE-DIAG-2026-10-14-C</div>
+            <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Prévia imediata de GIF + diagnóstico de upload do Firebase Storage, versão C.</div>
           </div>
           <h3 style="margin:14px 0 8px">Verificações locais</h3>
           <div id="test-checks" style="display:grid;gap:8px">
@@ -1679,17 +1679,42 @@ function setupUpload(areaId,inputId,previewId,setVal,isBanner){
   area.onclick=()=>input.click();
   input.onchange=async()=>{
     const f=input.files?.[0]; if(!f) return;
+    if(!f.type || !f.type.startsWith("image/")){
+      showToast("Escolha um arquivo de imagem válido."); input.value=""; return;
+    }
+    if(f.size > 10 * 1024 * 1024){
+      showToast("A imagem deve ter no máximo 10 MB."); input.value=""; return;
+    }
+    // Mostra o arquivo imediatamente na prévia, sem esperar pelo Firebase Storage.
+    // A URL local serve só para pré-visualização; o perfil só recebe a URL remota após upload bem-sucedido.
+    let localPreviewUrl=null;
+    if(preview){
+      try { localPreviewUrl=URL.createObjectURL(f); preview.src=localPreviewUrl; preview.classList.remove("hidden"); }
+      catch(e) { /* a prévia pode falhar sem impedir a tentativa de upload */ }
+    }
     area.style.opacity="0.65";
+    area.style.pointerEvents="none";
+    showToast("Prévia carregada. Enviando imagem para salvar no perfil...");
     try{
       const url=await readMediaFile(f, isBanner ? "banner" : "avatar");
       setVal(url);
-      if(preview){ preview.src=url; preview.classList.remove("hidden"); }
-      showToast(isBanner ? "GIF/banner enviado!" : "Foto de perfil enviada!");
+      if(preview) preview.src=url;
+      showToast(isBanner ? "Banner enviado! Agora salve o perfil." : "Foto enviada! Agora salve o perfil.");
     }catch(err){
-      showToast(err?.message || "Não foi possível enviar a imagem.");
+      setVal(null);
+      const code=err?.code||"";
+      let msg=err?.message||"Não foi possível enviar a imagem.";
+      if(code.includes("storage/unauthorized")) msg="O Firebase Storage bloqueou o upload por regras/permissões. A prévia aparece, mas a imagem não foi salva.";
+      else if(code.includes("storage/bucket-not-found")) msg="O bucket do Firebase Storage não foi encontrado. Confira o bucket configurado no Firebase.";
+      else if(code.includes("storage/unknown") || code.includes("storage/retry-limit-exceeded")) msg="Falha de rede ou Firebase Storage. A prévia aparece, mas o upload não terminou.";
+      showToast(msg);
+      console.error("CatWeb upload de imagem falhou:", code, err);
     }finally{
       area.style.opacity="";
+      area.style.pointerEvents="";
       input.value="";
+      // Não revogar a URL local enquanto ela ainda estiver sendo usada como prévia após erro.
+      if(localPreviewUrl && preview && preview.src !== localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
     }
   };
 }
