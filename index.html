@@ -889,14 +889,28 @@ function showToast(msg){
   setTimeout(()=>{ t.style.opacity="0"; t.style.transition="opacity .3s"; setTimeout(()=>t.remove(),300); },2800);
 }
 function getInitials(name){ return (name||"?").split(/\\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase(); }
-function isOwner(){ return userProfile?.role==="owner"||(currentUser?.email||"").toLowerCase()===OWNER_EMAIL; }
-function isModerator(){ return userProfile?.role==="moderator"||(currentUser?.email||"").toLowerCase()===MOD_EMAIL; }
+function isOwner(){
+  // Só e-mail do Auth (token assinado pelo Firebase). Nunca confiar só em userProfile.role do Firestore.
+  return (currentUser?.email||"").toLowerCase()===OWNER_EMAIL;
+}
+function isModerator(){
+  const em=(currentUser?.email||"").toLowerCase();
+  return em===MOD_EMAIL || em===OWNER_EMAIL;
+}
 function roleOfProfile(p){
+  // Exibição: e-mail conhecido (se presente no doc) ou role no Firestore (protegido pelas Rules).
   if(!p) return "user";
   const email = String(p.email||"").toLowerCase();
-  if(p.role==="owner" || email===OWNER_EMAIL) return "owner";
-  if(p.role==="moderator" || email===MOD_EMAIL) return "moderator";
-  return p.role||"user";
+  if(email===OWNER_EMAIL || p.role==="owner") return "owner";
+  if(email===MOD_EMAIL || p.role==="moderator") return "moderator";
+  return "user";
+}
+/** Campos que o próprio usuário NUNCA pode enviar em update de perfil */
+const USER_FORBIDDEN_WRITE = ["role","email","accountId","banned","banType","banUntil","banReason","followersCount","uid","createdAt"];
+function stripForbiddenUserFields(data){
+  const out={...data};
+  USER_FORBIDDEN_WRITE.forEach(k=>delete out[k]);
+  return out;
 }
 function badgeHtmlForRole(role){
   if(role==="owner"){
@@ -1025,7 +1039,13 @@ async function applyBan({targetUid,targetEmail,targetName,targetAccountId,target
       banned:true, banType:report.type, banUntil:until, banReason:report.reason
     },{merge:true}));
   }
-  await Promise.all(jobs);
+  try{
+    await Promise.all(jobs);
+  }catch(err){
+    console.error(err);
+    showToast("Ban recusado pelas regras do Firebase (sem permissão ou rules desatualizadas).");
+    return false;
+  }
   showToast(permanent?"Ban permanente aplicado":"Ban temporário aplicado");
   return true;
 }
@@ -1362,14 +1382,17 @@ async function loadUserProfile(uid){
       await db.collection("users").doc(uid).set({accountId:userProfile.accountId},{merge:true});
     }
     // keep old FW- ids if present
-    if(email===OWNER_EMAIL && userProfile.role!=="owner"){
-      userProfile.role="owner";
-      await db.collection("users").doc(uid).set({role:"owner",email},{merge:true});
-    }
-    if(email===MOD_EMAIL && userProfile.role!=="moderator" && userProfile.role!=="owner"){
-      userProfile.role="moderator";
-      await db.collection("users").doc(uid).set({role:"moderator",email},{merge:true});
-    }
+    // Bootstrap de cargo: só tenta gravar se o e-mail do Auth for staff.
+    // As Rules do Firestore rejeitam se outro usuário tentar forjar role.
+    try{
+      if(email===OWNER_EMAIL && userProfile.role!=="owner"){
+        await db.collection("users").doc(uid).set({role:"owner"},{merge:true});
+        userProfile.role="owner";
+      } else if(email===MOD_EMAIL && userProfile.role!=="moderator" && userProfile.role!=="owner"){
+        await db.collection("users").doc(uid).set({role:"moderator"},{merge:true});
+        userProfile.role="moderator";
+      }
+    }catch(e){ console.warn("Não foi possível sincronizar role (rules):", e.message||e); }
   }catch(e){
     console.error(e);
     userProfile={uid,displayName:auth.currentUser?.email||"Usuário",bio:"",role:"user",friends:[],following:[],followersCount:0,hideFriends:false,accountId:generateAccountId()};
@@ -1463,11 +1486,12 @@ async function handleRegister(e){
   try{
     const cred=await auth.createUserWithEmailAndPassword(email,pass);
     await cred.user.updateProfile({displayName:name});
+    const emailNorm=email.toLowerCase();
     await db.collection("users").doc(cred.user.uid).set({
-      displayName:name,bio:"",photoURL:null,bannerURL:null,role:"user",email,
+      displayName:name,bio:"",photoURL:null,bannerURL:null,role:"user",email:emailNorm,
       accountId:generateAccountId(),friends:[],following:[],followersCount:0,
-      incomingRequests:[],outgoingRequests:[],hideFriends:false,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      incomingRequests:[],outgoingRequests:[],hideFriends:false,blocked:[],
+      banned:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     closeAuth(); showToast("Conta criada no CatWeb");
   }catch(err){
@@ -1889,10 +1913,20 @@ async function handleEditProfile(e){
   errEl.classList.add("hidden"); btn.disabled=true; btn.textContent="Salvando...";
   try{
     const links=collectLinksFromForm();
-    const data={displayName:name,bio,photoURL:pendingAvatar||null,bannerURL:pendingBanner||null,links};
+    // Nunca enviar role/email/accountId/banned — Rules também bloqueiam
+    const data=stripForbiddenUserFields({
+      displayName:name,
+      bio,
+      photoURL:pendingAvatar||null,
+      bannerURL:pendingBanner||null,
+      links
+    });
     await db.collection("users").doc(currentUser.uid).set(data,{merge:true});
     await currentUser.updateProfile({displayName:name});
     userProfile={...userProfile,...data};
+    // role permanece o que veio do servidor / Auth
+    if(isOwner()) userProfile.role="owner";
+    else if(isModerator()) userProfile.role="moderator";
     document.getElementById("edit-profile-modal").classList.add("hidden");
     renderProfile(); updateUserArea(); renderConfig();
     showToast("Perfil atualizado");
