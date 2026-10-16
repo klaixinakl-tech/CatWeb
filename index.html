@@ -839,6 +839,34 @@ h1,h2,h3,.section-title,.view-title {
   cursor: progress;
 }
 
+
+/* CatWeb — abas de perfil, conversas, favoritos e avisos */
+.profile-timeline{max-width:600px;margin:16px auto 0}
+.timeline-tabs{display:flex;gap:3px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:14px;scrollbar-width:thin}
+.timeline-tab{flex:1;min-width:max-content;background:transparent;border:0;border-bottom:2px solid transparent;padding:12px 14px;color:var(--muted);font:600 .8rem var(--font-ui);cursor:pointer}
+.timeline-tab.active{color:var(--ink);border-bottom-color:var(--accent)}
+.profile-timeline .feed-post-card{margin-bottom:13px}
+.timeline-status{padding:22px 12px;color:var(--muted);text-align:center;font-size:.85rem}
+.timeline-reply{padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--card);margin:10px 0;cursor:pointer}
+.timeline-reply:hover{border-color:var(--accent)}
+.timeline-reply small{display:block;color:var(--muted);margin-bottom:5px}
+.timeline-reply p{color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.post-action.bookmarked{color:var(--accent)}
+.comment-thread-open{font:inherit;color:var(--accent);border:0;background:none;cursor:pointer;font-size:.75rem;margin-top:7px}
+.conversation-shell{max-width:790px;margin:auto}
+.conversation-back{border:1px solid var(--border);background:var(--card);color:var(--ink);padding:9px 13px;border-radius:10px;cursor:pointer;margin-bottom:15px}
+.conversation-focus{margin:14px 0 18px;padding:14px;background:var(--card);border:1px solid var(--accent);border-radius:10px}
+.conversation-focus .comment-item{margin-top:8px}
+.conversation-tree .comment-item{margin:8px 0}
+.conversation-depth{border-left:1px solid var(--border);padding-left:14px;margin-left:14px}
+.settings-notif-grid{display:grid;gap:10px}
+.settings-notif-row{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.settings-notif-row label{color:var(--ink);font-size:.85rem;cursor:pointer}
+.settings-notif-row input{width:18px;height:18px;accent-color:var(--accent)}
+.cat-notif-bubble{display:none;position:absolute;right:0;top:-5px;min-width:17px;padding:1px 4px;border-radius:10px;font-size:10px;line-height:15px;text-align:center;color:white;background:#a44872;font-family:var(--font-ui)}
+.nav-chat-bubble{display:inline-block;margin-left:5px;border-radius:10px;padding:1px 6px;background:#a44872;color:#fff;font-size:.7rem}
+.chat-friend-row .chat-unread{margin-left:auto;background:#a44872;color:white;border-radius:15px;padding:1px 7px;font-size:.7rem}
+@media(max-width:580px){.timeline-tab{padding:11px 10px;font-size:.76rem}.conversation-focus{padding:10px}}
   </style>
 </head>
 <body>
@@ -861,7 +889,8 @@ h1,h2,h3,.section-title,.view-title {
         <a href="#notificacoes" class="nav-link" data-nav="notificacoes" data-mark="◇">Notificações</a>
         <a href="#moderacao" class="nav-link" data-nav="moderacao" data-mark="⚖" id="nav-moderacao" style="display:none">Moderação</a>
         <a href="#perfil" class="nav-link" data-nav="perfil" data-mark="♙">Perfil</a>
-        <a href="#config" class="nav-link" data-nav="config" data-mark="✣">Config</a>
+        <a href="#salvos" class="nav-link" data-nav="salvos" data-mark="♧">Salvos</a>
+      <a href="#config" class="nav-link" data-nav="config" data-mark="✣">Config</a>
         <a href="#teste" class="nav-link" data-nav="teste" data-mark="⋄">Teste</a>
       </nav>
       <div class="user-area" id="user-area">
@@ -885,6 +914,7 @@ h1,h2,h3,.section-title,.view-title {
       <a href="#notificacoes" class="nav-link" data-nav="notificacoes" data-mark="◇">Notificações</a>
       <a href="#moderacao" class="nav-link" data-nav="moderacao" data-mark="⚖" id="nav-moderacao-m" style="display:none">Moderação</a>
       <a href="#perfil" class="nav-link" data-nav="perfil" data-mark="♙">Perfil</a>
+      <a href="#salvos" class="nav-link" data-nav="salvos" data-mark="♧">Salvos</a>
       <a href="#config" class="nav-link" data-nav="config" data-mark="✣">Config</a>
       <a href="#teste" class="nav-link" data-nav="teste" data-mark="⋄">Teste</a>
     </nav>
@@ -1097,14 +1127,17 @@ h1,h2,h3,.section-title,.view-title {
               </div>
             </div>
           </div>
+          <section class="profile-timeline" id="own-profile-activity"></section>
         </div>
       </div>
     </div>
 
     <div id="view-user" class="view">
-      <div class="container"><div id="public-profile"></div></div>
+      <div class="container"><div id="public-profile"></div><section class="profile-timeline" id="public-profile-activity"></section></div>
     </div>
 
+    <div id="view-conversa" class="view"><div class="container conversation-shell"><button type="button" class="conversation-back" onclick="history.length>1?history.back():location.hash='feed'">← Voltar</button><div id="conversation-content" aria-live="polite"></div></div></div>
+    <div id="view-salvos" class="view"><div class="container feed-container"><h1 style="font-family:var(--font-display)">✧ Publicações salvas</h1><p class="form-hint">Só você pode ver seus favoritos.</p><div id="saved-posts" class="feed-posts" style="margin-top:18px"></div></div></div>
     <div id="view-config" class="view">
       <div class="container">
         <div id="config-guest" class="placeholder-card">
@@ -1123,6 +1156,7 @@ h1,h2,h3,.section-title,.view-title {
               <button type="button" class="toggle" id="toggle-hide-friends" aria-label="Ocultar amigos"></button>
             </div>
           </div>
+          <div class="settings-card" id="cat-notif-settings"><h2>Notificações</h2><p class="form-hint" style="margin-bottom:12px">Escolha quais avisos deseja ver no CatWeb.</p><div id="notification-preferences" class="settings-notif-grid"></div></div>
           <div class="settings-card">
             <h2>Conta</h2>
             <div class="settings-row">
@@ -1153,7 +1187,7 @@ h1,h2,h3,.section-title,.view-title {
           <p>Verificações locais de interface do CatWeb. As operações reais do Firebase ainda precisam ser testadas com uma conta conectada.</p>
           <div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin:14px 0">
             <div style="font-weight:700">Identificação da versão</div>
-            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-PROFILE-NOSTORAGE-REVIEW-2026-10-14</div>
+            <div id="test-build-id" style="font-family:monospace;overflow-wrap:anywhere">CATWEB-NOCTURNE-SOCIAL-X-2026-10-16</div>
             <div style="font-size:.85rem;color:var(--muted);margin-top:5px">Correção de upload de imagens para Firebase Storage + teste de versão B.</div>
           </div>
           <h3 style="margin:14px 0 8px">Verificações locais</h3>
@@ -1841,10 +1875,10 @@ function onAuthChanged(user){
     updateUserArea();
     loadUserProfile(user.uid).then(async ()=>{
       if(await enforceBanOnAuth(user)){ updateUserArea(); updateModNav(); return; }
-      updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed(); renderNotifications();
+      updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed();loadNotificationPreferences().then(startNotificationIndicator); renderNotifications();
     });
   }else{
-    userProfile=null; updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed(); renderNotifications();
+    stopNotificationIndicator();notifPrefs={...DEFAULT_NOTIFICATION_PREFS}; userProfile=null; updateUserArea(); updateModNav(); renderProfile(); renderConfig(); renderMailbox(); updateComposerIdentity(); resetFeed(); renderNotifications();
   }
 }
 auth.onAuthStateChanged(onAuthChanged);
@@ -2159,6 +2193,7 @@ function renderProfile(){
       searchId:"my-friends-search", paginationId:"my-friends-pagination", canRemove:true
     });
   };
+  if(location.hash==="#perfil") renderProfileActivity(currentUser.uid,"own-profile-activity",true);
   const closeFriendsButton=document.getElementById("close-my-friends");
   if(closeFriendsButton) closeFriendsButton.onclick=()=>document.getElementById("my-friends-panel")?.classList.add("hidden");
 }
@@ -2374,6 +2409,7 @@ async function renderPublicProfile(uid){
           <div class="profile-actions">${actions}</div>
         </div>
       </div>`;
+    renderProfileActivity(uid,"public-profile-activity",false);
     if(!d.bannerURL){
       const b=document.getElementById("pub-banner");
       if(b) b.style.background="linear-gradient(135deg,#3a1a1a,var(--accent))";
@@ -2746,6 +2782,7 @@ async function renderChatList(){
         </div>
       </div>`;
     }).join("");
+    refreshNotificationIndicator();
     list.querySelectorAll(".chat-friend-row").forEach(row=>{
       row.addEventListener("click",()=>openChatWith(row.dataset.peer));
     });
@@ -2779,6 +2816,7 @@ async function openChatWith(peerUid){
     document.getElementById("chat-list-pane")?.classList.add("hidden-mobile");
     document.getElementById("chat-thread-pane")?.classList.add("open");
     listenChatMessages(peerUid);
+    await markChatNotificationsRead(peerUid);
     renderChatList();
     if(location.hash!=="#chat/"+peerUid) location.hash="chat/"+peerUid;
   }catch(e){
@@ -2854,7 +2892,7 @@ async function sendChatMessage(e){
     }
 
     const cid=await ensureChatDoc(activeChatPeer.uid);
-    await db.collection("chats").doc(cid).collection("messages").add({
+    const messageRef=await db.collection("chats").doc(cid).collection("messages").add({
       text,
       senderId: currentUser.uid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2865,6 +2903,7 @@ async function sendChatMessage(e){
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true});
     if(input){ input.value=""; updateChatCharCount(); }
+    await notifyChatMessage(activeChatPeer.uid,cid,messageRef.id,text).catch(e=>console.warn('Aviso de chat não enviado',e));
     showToast("Mensagem enviada.");
   }catch(err){
     const code=err?.code || "sem-código";
@@ -2981,6 +3020,7 @@ async function notifyMentionedUsers(text,post,context="post",eventId=null){
 }
 function notificationMessage(n){
   const name=esc(n.actorName||"Alguém");
+  if(n.type==="message")return `${name} enviou uma mensagem no chat.`;
   if(n.type==="like")return `${name} curtiu sua publicação.`;
   if(n.type==="comment")return `${name} respondeu à sua publicação.`;
   if(n.type==="reply")return `${name} respondeu ao seu comentário.`;
@@ -2997,15 +3037,18 @@ async function renderNotifications(){
     const snap=await db.collection("users").doc(currentUser.uid).collection("notifications").orderBy("createdAt","desc").limit(50).get();
     if(snap.empty){status.textContent="Nenhuma notificação por enquanto.";return;}
     status.textContent="";
+    let shown=0;
     snap.forEach(doc=>{
-      const n={id:doc.id,...doc.data()};const item=document.createElement("article");item.className="notification-item"+(n.read?"":" unread");
+      const n={id:doc.id,...doc.data()};if(!notificationEnabled(n.type))return;shown++;const item=document.createElement("article");item.className="notification-item"+(n.read?"":" unread");
       const preview=n.message||n.postText||"";
       item.innerHTML=`<span class="notification-icon">${n.type==="like"?"♡":n.type==="repost"?"⤴":n.type==="mention"?"@":"✧"}</span><div class="notification-copy"><strong>${notificationMessage(n)}</strong>${preview?`<span class="notification-preview">${esc(preview)}</span>`:""}<small>${esc(feedTime(n.createdAt))}</small></div>`;
       item.addEventListener("click",async()=>{
         if(!n.read){try{await db.collection("users").doc(currentUser.uid).collection("notifications").doc(n.id).update({read:true});item.classList.remove("unread");}catch(e){console.warn(e);}}
-        if(n.postId)location.hash="feed";
+        if(n.type==='message'&&n.postId){const peer=n.actorId;location.hash='chat/'+peer;}
+        else if(n.postId)location.hash='conversa/'+n.postId;
       });list.appendChild(item);
     });
+    if(!shown) status.textContent='Nenhuma notificação habilitada para mostrar.';
   }catch(err){console.error("Erro ao carregar notificações:",err);status.textContent=err?.code==="permission-denied"?"As regras do Firestore precisam permitir acessar suas notificações.":"Não foi possível carregar as notificações.";}
 }
 function setupNotificationsUI(){
@@ -3126,8 +3169,8 @@ async function loadFeedPage(append){
   }finally{feedBusy=false;}
 }
 function timestampMillis(ts){try{return ts?.toMillis?ts.toMillis():(ts?new Date(ts).getTime():0);}catch{return 0;}}
-async function renderFeedPosts(posts,append){
-  const list=document.getElementById("feed-posts");if(!list)return;
+async function renderFeedPosts(posts,append,containerId="feed-posts"){
+  const list=document.getElementById(containerId);if(!list)return;
   if(!append)list.innerHTML="";
   for(const post of posts){
     if(feedBlocked(post))continue;
@@ -3149,6 +3192,13 @@ async function renderFeedPosts(posts,append){
     card.querySelector('[data-post-action="like"]')?.addEventListener("click",()=>togglePostLike(post,card));
     card.querySelector('[data-post-action="comments"]')?.addEventListener("click",()=>togglePostComments(post,card));
     card.querySelector('[data-post-action="repost"]')?.addEventListener("click",()=>repostPost(post));
+    const actions=card.querySelector('.post-actions');
+    if(actions){
+      const save=document.createElement('button');save.type='button';save.className='post-action';save.innerHTML='♧ <span>Salvar</span>';save.title='Salvar publicação (privado)';
+      save.addEventListener('click',()=>toggleBookmark(post,save));actions.appendChild(save);
+      const open=document.createElement('button');open.type='button';open.className='post-action';open.textContent='↗ Ver conversa';open.addEventListener('click',()=>{location.hash='conversa/'+post.id;});actions.appendChild(open);
+      if(currentUser)db.collection('users').doc(currentUser.uid).collection('bookmarks').doc(post.id).get().then(d=>{if(d.exists){save.classList.add('bookmarked');save.querySelector('span').textContent='Salvo';}}).catch(()=>{});
+    }
     card.querySelector('[data-post-action="delete"]')?.addEventListener("click",()=>deletePost(post,card));
     card.querySelector(".comment-form")?.addEventListener("submit",e=>createPostComment(e,post,card));
   }
@@ -3214,6 +3264,8 @@ function commentElement(comment,post,card){
   const author=comment.authorName||"Usuário";
   el.innerHTML=`<div class="comment-topline">${feedAvatarHtml(comment.authorPhotoURL||comment.photoURL,author)}<div class="comment-content"><div class="comment-meta"><a class="comment-author-link" href="#user/${esc(comment.authorId||"")}"><strong>${esc(author)}</strong></a><span>${comment.authorAccountId?`@${esc(comment.authorAccountId)} · `:""}${esc(feedTime(comment.createdAt))}</span></div><div class="comment-body">${feedTextHtml(comment.text||"")}</div><div class="comment-actions"><button type="button" class="comment-reply" data-reply-id="${esc(comment.id)}" data-reply-name="${esc(author)}">Responder</button><button type="button" class="comment-like" aria-label="Curtir resposta">♡ Curtir</button><button type="button" class="comment-repost" aria-label="Repostar resposta">⤴ Repostar</button></div></div></div>`;
   bindFeedMentions(el);
+  const openThread=document.createElement('button');openThread.className='comment-thread-open';openThread.type='button';openThread.textContent='↗ Ver conversa e respostas';
+  openThread.addEventListener('click',()=>{location.hash='conversa/'+post.id+'/'+comment.id;});el.querySelector('.comment-content')?.appendChild(openThread);
   el.querySelector(".comment-reply")?.addEventListener("click",()=>{
     if(!currentUser){showToast("Entre na sua conta para responder.");return;}
     feedReplyTargets[post.id]={id:comment.id,name:author};
@@ -3264,6 +3316,7 @@ async function createPostComment(e,post,card){
     const note=card.querySelector(".comment-replying");note?.classList.add("hidden");
     const count=card.querySelector(".comment-count");if(count)count.textContent=String((Number(count.textContent)||0)+1);
     showToast("Resposta publicada.");await loadPostComments(post,card);
+    if(location.hash.startsWith('#conversa/'+post.id))renderConversationPage(post.id,location.hash.split('/')[2]||null);
   }catch(err){
     console.error("Falha ao responder:",err);
     showToast(err?.code==="permission-denied"?"As regras do Firestore precisam permitir criar comentários e atualizar o contador.":"Não foi possível publicar a resposta.");
@@ -3290,10 +3343,167 @@ async function deletePost(post,card){
   }catch(err){console.error("Falha ao excluir post:",err);showToast(err?.code==="permission-denied"?"As regras do Firestore precisam permitir excluir suas publicações.":"Não foi possível excluir a publicação.");}
 }
 
+
+// ===== Perfil social / favoritos / conversa =====
+const ACTIVITY_LIMIT=100;
+const DEFAULT_NOTIFICATION_PREFS={like:true,comment:true,reply:true,repost:true,mention:true,message:true};
+let notifPrefs={...DEFAULT_NOTIFICATION_PREFS},notifUnsub=null,notifEvents=[];
+const notifLabels={like:'Curtidas',comment:'Comentários em posts',reply:'Respostas',repost:'Reposts',mention:'Menções',message:'Mensagens privadas'};
+function notificationEnabled(type){return notifPrefs[type]!==false;}
+async function loadNotificationPreferences(){
+  if(!currentUser)return;
+  try{const snap=await db.collection('users').doc(currentUser.uid).collection('settings').doc('notifications').get();notifPrefs={...DEFAULT_NOTIFICATION_PREFS,...(snap.exists?snap.data():{})};}
+  catch(e){console.warn('Configurações de notificações:',e);notifPrefs={...DEFAULT_NOTIFICATION_PREFS};}
+}
+function renderNotifSettings(){
+ const el=document.getElementById('notification-preferences');if(!el||!currentUser)return;
+ el.innerHTML='';
+ for(const [key,label] of Object.entries(notifLabels)){
+   const row=document.createElement('div');row.className='settings-notif-row';
+   const id='cat-pref-'+key;
+   row.innerHTML=`<label for="${id}">${esc(label)}</label><input type="checkbox" id="${id}" ${notificationEnabled(key)?'checked':''}>`;
+   row.querySelector('input').addEventListener('change',async e=>{
+     const val=e.target.checked;notifPrefs[key]=val;
+     try{await db.collection('users').doc(currentUser.uid).collection('settings').doc('notifications').set({[key]:val},{merge:true});renderNotifications();refreshNotificationIndicator();}
+     catch(err){notifPrefs[key]=!val;e.target.checked=!val;showToast('Não foi possível atualizar a preferência.');}
+   });
+   el.appendChild(row);
+ }
+}
+function stopNotificationIndicator(){if(notifUnsub){notifUnsub();notifUnsub=null;}notifEvents=[];document.querySelectorAll('.nav-chat-bubble').forEach(e=>e.remove());}
+function startNotificationIndicator(){
+ stopNotificationIndicator();if(!currentUser)return;
+ notifUnsub=db.collection('users').doc(currentUser.uid).collection('notifications').orderBy('createdAt','desc').limit(100).onSnapshot(s=>{
+   notifEvents=s.docs.map(d=>({id:d.id,...d.data()}));refreshNotificationIndicator();
+ },e=>console.warn('Avisos em tempo real indisponíveis:',e));
+}
+function refreshNotificationIndicator(){
+ const msgs=notifEvents.filter(n=>n.type==='message'&&!n.read&&notificationEnabled(n.type));
+ const others=notifEvents.filter(n=>n.type!=='message'&&!n.read&&notificationEnabled(n.type));
+ document.querySelectorAll('.nav-chat-bubble').forEach(e=>e.remove());
+ for(const a of document.querySelectorAll('a[href="#chat"],a[href="#notificacoes"]')){
+   const isChat=a.getAttribute('href')==='#chat';const count=isChat?msgs.length:msgs.length+others.length;
+   if(count){const badge=document.createElement('span');badge.className='nav-chat-bubble';badge.textContent=count>99?'99+':String(count);a.appendChild(badge);}
+ }
+ document.querySelectorAll('.chat-friend-row').forEach(row=>{
+   row.querySelector('.chat-unread')?.remove();const n=msgs.filter(m=>m.actorId===row.dataset.peer).length;
+   if(n){const badge=document.createElement('span');badge.className='chat-unread';badge.textContent=String(n);row.appendChild(badge);}
+ });
+ // Balão de aviso integrado à interface, sem notificações do sistema operacional.
+ const latest=msgs[0];
+ if(latest && latest.id!==window._lastChatBubble && window._lastChatBubbleInitialized){
+   window._lastChatBubble=latest.id;
+   if(location.hash!=='#chat/'+latest.actorId)showToast('☽ Nova mensagem de '+(latest.actorName||'um amigo'));
+ }else if(!window._lastChatBubbleInitialized){window._lastChatBubbleInitialized=true;window._lastChatBubble=latest?.id||null;}
+}
+async function notifyChatMessage(peerUid,chatId,messageId,text){
+ if(!currentUser||peerUid===currentUser.uid)return;
+ const ref=db.collection('users').doc(peerUid).collection('notifications').doc(currentUser.uid+'_message_'+chatId+'_'+messageId+'_'+peerUid);
+ await ref.set({recipientId:peerUid,actorId:currentUser.uid,actorName:userProfile?.displayName||'Usuário',actorAccountId:userProfile?.accountId||'',type:'message',postId:chatId,eventId:messageId,postText:'',message:String(text||'').slice(0,180),createdAt:firebase.firestore.FieldValue.serverTimestamp(),read:false});
+}
+async function markChatNotificationsRead(peerUid){
+ if(!currentUser||!peerUid)return;
+ const notes=notifEvents.filter(n=>n.type==='message'&&!n.read&&n.actorId===peerUid).slice(0,100);
+ if(!notes.length)return;
+ for(let i=0;i<notes.length;i+=100){const b=db.batch();notes.slice(i,i+100).forEach(n=>b.update(db.collection('users').doc(currentUser.uid).collection('notifications').doc(n.id),{read:true}));try{await b.commit();}catch(e){console.warn('Lido:',e);}}
+}
+async function toggleBookmark(post,btn){
+ if(!currentUser){showToast('Entre na sua conta para salvar.');return;}
+ btn.disabled=true;
+ const ref=db.collection('users').doc(currentUser.uid).collection('bookmarks').doc(post.id);
+ try{const d=await ref.get();if(d.exists){await ref.delete();btn.classList.remove('bookmarked');btn.querySelector('span').textContent='Salvar';}
+ else{await ref.set({postId:post.id,createdAt:firebase.firestore.FieldValue.serverTimestamp()});btn.classList.add('bookmarked');btn.querySelector('span').textContent='Salvo';}
+ }catch(e){console.error(e);showToast('Não foi possível alterar os favoritos.');}finally{btn.disabled=false;}
+}
+async function renderSavedPosts(){
+ const box=document.getElementById('saved-posts');if(!box)return;
+ if(!currentUser){box.textContent='Entre para ver seus favoritos.';return;}
+ box.innerHTML='<div class="timeline-status">Carregando favoritos…</div>';
+ try{
+  const bookmarks=await db.collection('users').doc(currentUser.uid).collection('bookmarks').limit(100).get();
+  const docs=await Promise.all(bookmarks.docs.map(async d=>{const p=await db.collection('posts').doc(d.id).get();return p.exists?{id:p.id,...p.data()}:null;}));
+  const posts=docs.filter(Boolean).sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
+  if(!posts.length){box.innerHTML='<div class="timeline-status">Você ainda não salvou publicações.</div>';return;}
+  await renderFeedPosts(posts,false,'saved-posts');
+ }catch(e){console.error(e);box.innerHTML='<div class="timeline-status">Erro ao carregar favoritos. Confira as regras do Firestore.</div>';}
+}
+async function renderProfileActivity(uid,mountId,isOwn){
+ const root=document.getElementById(mountId);if(!root||!uid)return;
+ if(root.dataset.ownerUid!==uid){root.dataset.ownerUid=uid;root.dataset.activeTab='posts';}
+ const selected=root.dataset.activeTab||'posts';
+ root.innerHTML=`<div class="timeline-tabs" role="tablist"><button class="timeline-tab ${selected==='posts'?'active':''}" data-tab="posts">Posts</button><button class="timeline-tab ${selected==='replies'?'active':''}" data-tab="replies">Respostas</button><button class="timeline-tab ${selected==='reposts'?'active':''}" data-tab="reposts">Reposts</button>${isOwn?`<button class="timeline-tab ${selected==='saved'?'active':''}" data-tab="saved">Salvos ♧</button>`:''}</div><div class="timeline-status" id="${mountId}-status">Carregando…</div><div class="feed-posts" id="${mountId}-list"></div>`;
+ root.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{root.dataset.activeTab=btn.dataset.tab;renderProfileActivity(uid,mountId,isOwn);}));
+ const status=root.querySelector('.timeline-status');const listId=mountId+'-list';
+ const token=(root.dataset.loadToken=String(Number(root.dataset.loadToken||0)+1));
+ try{
+  if(selected==='saved'){
+   if(!isOwn){status.textContent='Favoritos privados.';return;}
+   const bookmarks=await db.collection('users').doc(uid).collection('bookmarks').limit(ACTIVITY_LIMIT).get();
+   const posts=(await Promise.all(bookmarks.docs.map(async d=>{const p=await db.collection('posts').doc(d.id).get();return p.exists?{id:p.id,...p.data()}:null;}))).filter(Boolean);
+   if(root.dataset.loadToken!==token)return;
+   posts.sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));status.textContent=posts.length?'':'Nenhum favorito salvo.';await renderFeedPosts(posts,false,listId);return;
+  }
+  if(selected==='replies'){
+   const comments=await db.collectionGroup('comments').where('authorId','==',uid).limit(ACTIVITY_LIMIT).get();
+   if(root.dataset.loadToken!==token)return;
+   const arr=comments.docs.map(d=>({id:d.id,postId:d.ref.parent.parent?.id,...d.data()})).sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
+   status.textContent=arr.length?'':'Nenhuma resposta encontrada.';
+   for(const c of arr){
+     const item=document.createElement('article');item.className='timeline-reply';item.tabIndex=0;
+     item.innerHTML=`<small>☾ Respondeu a uma conversa · ${esc(feedTime(c.createdAt))}</small><p>${esc(c.text||'')}</p><small>↗ Ver resposta e contexto</small>`;
+     item.onclick=()=>{location.hash='conversa/'+c.postId+'/'+c.id;};
+     item.onkeydown=e=>{if(e.key==='Enter')item.click();};root.querySelector('#'+listId)?.appendChild(item);
+   }
+   return;
+  }
+  const snap=await db.collection('posts').where('authorId','==',uid).limit(ACTIVITY_LIMIT).get();
+  if(root.dataset.loadToken!==token)return;
+  const posts=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>selected==='reposts'?p.type==='repost':p.type!=='repost').sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
+  status.textContent=posts.length?'':selected==='reposts'?'Nenhum repost ainda.':'Nenhuma publicação ainda.';
+  await renderFeedPosts(posts,false,listId);
+ }catch(e){console.error('Atividade:',e);status.textContent=e.code==='failed-precondition'?'O Firestore pediu um índice de consulta para esta aba. Veja o Console.':'Não foi possível carregar esta aba.';}
+}
+async function renderConversationPage(postId,commentId){
+ const box=document.getElementById('conversation-content');if(!box)return;
+ box.innerHTML='<div class="timeline-status">Carregando conversa…</div>';
+ try{
+  const doc=await db.collection('posts').doc(postId).get();if(!doc.exists){box.textContent='Publicação não encontrada.';return;}
+  const post={id:doc.id,...doc.data()};
+  box.innerHTML='<div id="conversation-posts" class="feed-posts"></div><h2 style="margin:22px 0 10px;font-family:var(--font-display)">Conversa</h2><div id="conversation-thread" class="conversation-tree"></div>';
+  await renderFeedPosts([post],false,'conversation-posts');
+  const card=box.querySelector('.feed-post-card');if(!card)return;
+  const comments=await db.collection('posts').doc(postId).collection('comments').orderBy('createdAt','asc').limit(200).get();
+  const all=comments.docs.map(d=>({id:d.id,...d.data()}));const byId=new Map(all.map(c=>[c.id,c]));
+  const thread=box.querySelector('#conversation-thread');
+  const visited=new Set();
+  const add=(c,depth)=>{
+    if(visited.has(c.id))return;visited.add(c.id);
+    const wrapper=document.createElement('div');wrapper.className=depth?'conversation-depth':'';
+    const el=commentElement(c,post,card);if(c.id===commentId)el.classList.add('conversation-focus');
+    wrapper.appendChild(el);thread.appendChild(wrapper);
+    all.filter(x=>x.parentId===c.id).forEach(child=>add(child,depth+1));
+  };
+  if(commentId){
+    const center=byId.get(commentId);
+    if(center){const chain=[];let next=center;const seen=new Set();while(next&&!seen.has(next.id)){chain.unshift(next);seen.add(next.id);next=byId.get(next.parentId);}chain.forEach((c,i)=>{if(!visited.has(c.id)){const wrap=document.createElement('div');wrap.className=i?'conversation-depth':'';const el=commentElement(c,post,card);if(c.id===commentId)el.classList.add('conversation-focus');wrap.appendChild(el);thread.appendChild(wrap);visited.add(c.id);}});all.filter(c=>c.parentId===commentId).forEach(c=>add(c,1));}
+    else thread.innerHTML='<div class="timeline-status">Resposta não encontrada entre as 200 mais antigas. Abra o post para ver outras respostas.</div>';
+  }else{all.filter(c=>!c.parentId||!byId.has(c.parentId)).forEach(c=>add(c,0));}
+  if(!all.length)thread.innerHTML='<div class="timeline-status">Nenhuma resposta ainda.</div>';
+  card.querySelector('.post-comments')?.classList.remove('hidden');
+  const inline=card.querySelector('.comment-list');if(inline)inline.innerHTML='<div class="timeline-status">Responda abaixo ou selecione um comentário nesta conversa.</div>';
+  if(commentId&&byId.has(commentId)){
+    const target=byId.get(commentId);feedReplyTargets[postId]={id:commentId,name:target.authorName||'Usuário'};
+    const note=card.querySelector('.comment-replying');if(note){note.textContent='Respondendo a '+(target.authorName||'Usuário')+' — cancelar';note.classList.remove('hidden');note.onclick=()=>{delete feedReplyTargets[postId];note.classList.add('hidden');};}
+  }
+ }catch(e){console.error(e);box.innerHTML='<div class="timeline-status">Não foi possível abrir a conversa. Confira as regras e sua conexão.</div>';}
+}
+
 function router(){
   const raw=location.hash.slice(1)||"feed";
   const [page,param]=raw.split("/");
   if(page==="user"&&param){ showView("user"); renderPublicProfile(param); return; }
+  if(page==="conversa"&&param){stopChatListener();showView("conversa");renderConversationPage(param,raw.split('/')[2]||null);return;}
+  if(page==="salvos"){stopChatListener();showView("salvos");renderSavedPosts();return;}
   if(page==="chat"){
     showView("chat");
     renderChatList().then(()=>{
@@ -3305,11 +3515,11 @@ function router(){
     return;
   }
   stopChatListener();
-  const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config","teste"];
+  const pages=["feed","busca","chat","correio","notificacoes","moderacao","perfil","config","teste","salvos"];
   if(pages.includes(page)){
     showView(page);
     if(page==="perfil") renderProfile();
-    if(page==="config") renderConfig();
+    if(page==="config") {renderConfig();renderNotifSettings();}
     if(page==="correio") renderMailbox();
     if(page==="notificacoes") renderNotifications();
     if(page==="moderacao") renderModeration();
