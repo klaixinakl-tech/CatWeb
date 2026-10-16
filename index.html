@@ -1776,10 +1776,16 @@ function publicProfileData(p){
   return data;
 }
 async function syncPublicProfile(){
-  if(!currentUser||!userProfile)return;
+  if(!currentUser||!userProfile)return false;
   try{
     await db.collection("public_profiles").doc(currentUser.uid).set(publicProfileData(userProfile),{merge:true});
-  }catch(e){console.warn("Falha ao sincronizar perfil público",e);}
+    return true;
+  }catch(e){
+    console.error("Falha ao sincronizar perfil público:", e);
+    if(e?.code==="permission-denied")
+      showToast("Não foi possível sincronizar seu perfil público. Execute a migração ou verifique as regras.");
+    return false;
+  }
 }
 async function publicProfile(uid){
   if(uid===currentUser?.uid && userProfile)return {uid,...publicProfileData(userProfile)};
@@ -1821,8 +1827,10 @@ async function loadUserProfile(uid){
     }catch(e){ console.warn("Não foi possível sincronizar role (rules):", e.message||e); }
     await syncPublicProfile();
   }catch(e){
-    console.error(e);
-    userProfile={uid,displayName:auth.currentUser?.email||"Usuário",bio:"",role:"user",friends:[],following:[],followersCount:0,hideFriends:false,accountId:generateAccountId()};
+    console.error("Falha ao carregar dados privados do perfil:",e);
+    showToast("Falha ao carregar seu perfil. Atualize a página e confira as permissões.");
+    // Não inventar uma lista vazia: isso esconderia amizades reais em uma falha de leitura.
+    userProfile=null;
   }
 }
 
