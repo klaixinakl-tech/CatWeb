@@ -2903,7 +2903,7 @@ async function sendChatMessage(e){
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true});
     if(input){ input.value=""; updateChatCharCount(); }
-    await notifyChatMessage(activeChatPeer.uid,cid,messageRef.id,text).catch(e=>console.warn('Aviso de chat não enviado',e));
+    await notifyChatMessage(activeChatPeer.uid,cid,messageRef.id,text).catch(e=>{console.error('Aviso de chat não enviado:',e);showToast(e?.code==='permission-denied'?'Mensagem enviada, mas aviso bloqueado: atualize as regras Firestore.':'Mensagem enviada; falha no aviso: '+(e?.code||'rede'));});
     showToast("Mensagem enviada.");
   }catch(err){
     const code=err?.code || "sem-código";
@@ -3026,6 +3026,7 @@ function notificationMessage(n){
   if(n.type==="reply")return `${name} respondeu ao seu comentário.`;
   if(n.type==="repost")return `${name} repostou sua publicação.`;
   if(n.type==="mention")return `${name} mencionou você.`;
+  if(n.type==="message")return `${name} enviou uma mensagem privada.`;
   return `${name} interagiu com você.`;
 }
 async function renderNotifications(){
@@ -3363,9 +3364,10 @@ function renderNotifSettings(){
    const id='cat-pref-'+key;
    row.innerHTML=`<label for="${id}">${esc(label)}</label><input type="checkbox" id="${id}" ${notificationEnabled(key)?'checked':''}>`;
    row.querySelector('input').addEventListener('change',async e=>{
-     const val=e.target.checked;notifPrefs[key]=val;
-     try{await db.collection('users').doc(currentUser.uid).collection('settings').doc('notifications').set({[key]:val},{merge:true});renderNotifications();refreshNotificationIndicator();}
-     catch(err){notifPrefs[key]=!val;e.target.checked=!val;showToast('Não foi possível atualizar a preferência.');}
+     const val=e.target.checked;e.target.disabled=true;
+     try{await db.collection('users').doc(currentUser.uid).collection('settings').doc('notifications').set({[key]:val},{merge:true});notifPrefs[key]=val;renderNotifications();refreshNotificationIndicator();}
+     catch(err){console.error('Preferência de notificação:',key,err);e.target.checked=!val;showToast(err?.code==='permission-denied'?'Permissão negada: atualize as regras Firestore deste pacote.':'Falha ao salvar preferência: '+(err?.code||'rede'));}
+     finally{e.target.disabled=false;}
    });
    el.appendChild(row);
  }
@@ -3413,7 +3415,7 @@ async function toggleBookmark(post,btn){
  const ref=db.collection('users').doc(currentUser.uid).collection('bookmarks').doc(post.id);
  try{const d=await ref.get();if(d.exists){await ref.delete();btn.classList.remove('bookmarked');btn.querySelector('span').textContent='Salvar';}
  else{await ref.set({postId:post.id,createdAt:firebase.firestore.FieldValue.serverTimestamp()});btn.classList.add('bookmarked');btn.querySelector('span').textContent='Salvo';}
- }catch(e){console.error(e);showToast('Não foi possível alterar os favoritos.');}finally{btn.disabled=false;}
+ }catch(e){console.error('Favoritos:',e);showToast(e?.code==='permission-denied'?'Favoritos bloqueados: publique as regras Firestore deste pacote.':'Erro ao salvar: '+(e?.code||'ver console'));}finally{btn.disabled=false;}
 }
 async function renderSavedPosts(){
  const box=document.getElementById('saved-posts');if(!box)return;
@@ -3425,7 +3427,7 @@ async function renderSavedPosts(){
   const posts=docs.filter(Boolean).sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
   if(!posts.length){box.innerHTML='<div class="timeline-status">Você ainda não salvou publicações.</div>';return;}
   await renderFeedPosts(posts,false,'saved-posts');
- }catch(e){console.error(e);box.innerHTML='<div class="timeline-status">Erro ao carregar favoritos. Confira as regras do Firestore.</div>';}
+ }catch(e){console.error(e);box.innerHTML='<div class="timeline-status">Favoritos indisponíveis. '+(e.code==='permission-denied'?'As regras Firestore do pacote precisam ser publicadas.':esc(e.code||'Ver console'))+'</div>';}
 }
 async function renderProfileActivity(uid,mountId,isOwn){
  const root=document.getElementById(mountId);if(!root||!uid)return;
@@ -3444,7 +3446,7 @@ async function renderProfileActivity(uid,mountId,isOwn){
    posts.sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));status.textContent=posts.length?'':'Nenhum favorito salvo.';await renderFeedPosts(posts,false,listId);return;
   }
   if(selected==='replies'){
-   const comments=await db.collectionGroup('comments').where('authorId','==',uid).limit(ACTIVITY_LIMIT).get();
+   const comments=await db.collectionGroup('comments').where('authorId','==',uid).orderBy('createdAt','desc').limit(ACTIVITY_LIMIT).get();
    if(root.dataset.loadToken!==token)return;
    const arr=comments.docs.map(d=>({id:d.id,postId:d.ref.parent.parent?.id,...d.data()})).sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
    status.textContent=arr.length?'':'Nenhuma resposta encontrada.';
@@ -3461,7 +3463,7 @@ async function renderProfileActivity(uid,mountId,isOwn){
   const posts=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>selected==='reposts'?p.type==='repost':p.type!=='repost').sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
   status.textContent=posts.length?'':selected==='reposts'?'Nenhum repost ainda.':'Nenhuma publicação ainda.';
   await renderFeedPosts(posts,false,listId);
- }catch(e){console.error('Atividade:',e);status.textContent=e.code==='failed-precondition'?'O Firestore pediu um índice de consulta para esta aba. Veja o Console.':'Não foi possível carregar esta aba.';}
+ }catch(e){console.error('Atividade:',e);status.textContent=e.code==='failed-precondition'?'O Firestore não encontrou o índice de respostas (authorId crescente + createdAt decrescente, escopo grupo de coleções).':e.code==='permission-denied'?'A leitura de respostas está bloqueada nas regras Firestore. Publique o arquivo deste pacote.':'Não foi possível carregar esta aba ('+(e.code||'erro')+').';}
 }
 async function renderConversationPage(postId,commentId){
  const box=document.getElementById('conversation-content');if(!box)return;
@@ -3519,7 +3521,7 @@ function router(){
   if(pages.includes(page)){
     showView(page);
     if(page==="perfil") renderProfile();
-    if(page==="config") {renderConfig();renderNotifSettings();}
+    if(page==="config") {renderConfig();loadNotificationPreferences().then(()=>{if(location.hash==="#config")renderNotifSettings();}).catch(e=>console.warn(e));}
     if(page==="correio") renderMailbox();
     if(page==="notificacoes") renderNotifications();
     if(page==="moderacao") renderModeration();
