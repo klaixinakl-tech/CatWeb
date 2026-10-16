@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark" data-build="CATWEB-PROFILE-NOSTORAGE-REVIEW-2026-10-14">
+<html lang="pt-BR" data-theme="dark" data-build="CATWEB-SECURITY-MIGRATION-2026-10-16">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1290,7 +1290,31 @@ const BADGE_CREATOR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABICAY
 const BADGE_MOD = "data:image/png;base64,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";
 let currentUser = null, userProfile = null;
 
-function esc(t){ if(!t)return""; const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+function esc(t){
+  return String(t??"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+// Somente URLs de imagens esperadas; nunca usar entrada de usuário diretamente em src.
+function accountIsSuspended(p){
+  if(!p?.banned)return false;
+  if(p.banType==="permanent")return true;
+  if(typeof p.banUntil==="number")return p.banUntil>Date.now();
+  return true;
+}
+
+function safeImageUrl(value){
+  const raw=String(value||"").trim();
+  if(raw.length>460000) return "";
+  if(/^data:image\/(?:png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(raw)) return raw;
+  try {const u=new URL(raw);if(u.protocol==="https:")return u.href;}catch(_){}
+  return "";
+}
+function imageAttr(value){return esc(safeImageUrl(value));}
+function safeExternalLink(value){
+  let raw=String(value||"").trim();
+  if(!/^https?:\/\//i.test(raw))raw="https://"+raw;
+  try{const u=new URL(raw);return ["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return "";}
+}
 function showToast(msg){
   document.querySelector(".toast")?.remove();
   const t=document.createElement("div"); t.className="toast"; t.textContent=msg;
@@ -1355,13 +1379,7 @@ function formatBanUntil(ts){
   if(!ts) return "Permanente";
   return new Date(ts).toLocaleString("pt-BR");
 }
-async function getClientIp(){
-  try{
-    const r=await fetch("https://api.ipify.org?format=json");
-    const j=await r.json();
-    return j.ip||"";
-  }catch{ return ""; }
-}
+async function getClientIp(){return "";}
 async function findActiveBan({uid,email,ip}){
   try{
     const col=db.collection("bans");
@@ -1414,93 +1432,75 @@ async function resolveBanTarget(raw){
 }
 let pendingBanTarget=null;
 async function applyBan({targetUid,targetEmail,targetName,targetAccountId,targetAt,durationKey,reason}){
-  if(!canModerate()){ showToast("Sem permissão"); return false; }
-  if(!reason || !String(reason).trim()){ showToast("Informe o motivo"); return false; }
-  const permanent = durationKey==="permanent";
-  if(permanent && !isOwner()){ showToast("Só o Creator pode banir permanente"); return false; }
-  const until = permanent ? null : (Date.now()+durationMs(durationKey));
-  const ip = await getClientIp();
-  const report={
-    type: permanent?"permanent":"temporary",
-    durationKey: durationKey||"",
-    until: until,
-    reason: String(reason).trim(),
-    targetUid: targetUid||null,
-    targetEmail: (targetEmail||"").toLowerCase()||null,
-    targetName: targetName||"",
-    targetAccountId: targetAccountId||"",
-    targetAt: targetAt||"",
-    targetIp: ip||null,
-    byUid: currentUser.uid,
-    byEmail: (currentUser.email||"").toLowerCase(),
-    byName: userProfile?.displayName||"",
-    byRole: isOwner()?"owner":"moderator",
-    createdAt: Date.now(),
-    revoked: false
-  };
-  const jobs=[];
-  if(targetUid) jobs.push(db.collection("bans").doc("uid_"+targetUid).set(report,{merge:true}));
-  if(targetEmail) jobs.push(db.collection("bans").doc("email_"+String(targetEmail).toLowerCase()).set(report,{merge:true}));
-  if(ip) jobs.push(db.collection("bans").doc("ip_"+ip).set({...report, note:"IP no momento do ban"},{merge:true}));
-  jobs.push(db.collection("ban_reports").add(report));
-  if(targetUid){
-    jobs.push(db.collection("users").doc(targetUid).set({
-      banned:true, banType:report.type, banUntil:until, banReason:report.reason
-    },{merge:true}));
-  }
+  if(!canModerate()){showToast("Sem permissão");return false;}
+  if(!String(reason||"").trim()){showToast("Informe o motivo.");return false;}
+  const permanent=durationKey==="permanent";
+  if(permanent&&!isOwner()){showToast("Só o Creator pode banir permanentemente.");return false;}
+  const until=permanent?null:Date.now()+durationMs(durationKey);
+  if(!permanent && !durationMs(durationKey)){showToast("Selecione uma duração válida.");return false;}
   try{
-    await Promise.all(jobs);
-  }catch(err){
-    console.error(err);
-    showToast("Ban recusado pelas regras do Firebase (sem permissão ou rules desatualizadas).");
-    return false;
-  }
-  showToast(permanent?"Ban permanente aplicado":"Ban temporário aplicado");
-  return true;
+    if(targetUid&&!targetEmail){
+      const target=await db.collection("users").doc(targetUid).get();
+      if(target.exists)targetEmail=target.data().email||null;
+    }
+    const report={
+      type:permanent?"permanent":"temporary",durationKey:durationKey||"",until,
+      reason:String(reason).trim().slice(0,500),targetUid:targetUid||null,
+      targetEmail:(targetEmail||"").toLowerCase()||null,
+      targetName:targetName||"",targetAccountId:targetAccountId||"",targetAt:targetAt||"",
+      targetIp:null,byUid:currentUser.uid,byEmail:(currentUser.email||"").toLowerCase(),
+      byName:userProfile?.displayName||"",byRole:isOwner()?"owner":"moderator",
+      createdAt:Date.now(),revoked:false
+    };
+    const batch=db.batch();
+    if(targetUid)batch.set(db.collection("bans").doc("uid_"+targetUid),report,{merge:true});
+    if(targetEmail)batch.set(db.collection("bans").doc("email_"+String(targetEmail).toLowerCase()),report,{merge:true});
+    batch.set(db.collection("ban_reports").doc(),report);
+    if(targetUid){
+      const userRef=db.collection("users").doc(targetUid);
+      const existing=await userRef.get();
+      if(existing.exists)batch.update(userRef,{banned:true,banType:report.type,banUntil:until,banReason:report.reason});
+    }
+    await batch.commit();
+    showToast(permanent?"Banimento permanente aplicado":"Suspensão aplicada");return true;
+  }catch(err){console.error(err);showToast("Não foi possível aplicar o banimento. Confira as regras.");return false;}
 }
-async function revokeBan(banDocId, banData){
-  if(!banData) return;
-  const isPerm = banData.type==="permanent";
-  if(isPerm && !isOwner()){ showToast("Só o Creator revoga ban permanente"); return; }
-  if(!isPerm && !canModerate()){ showToast("Sem permissão"); return; }
-  const patch={revoked:true,revokedAt:Date.now(),revokedBy:currentUser.uid};
-  await db.collection("bans").doc(banDocId).set(patch,{merge:true});
-  if(banData.targetUid){
-    await db.collection("users").doc(banData.targetUid).set({banned:false,banType:null,banUntil:null,banReason:null},{merge:true});
-    if(banData.targetEmail) await db.collection("bans").doc("email_"+banData.targetEmail).set(patch,{merge:true});
-  }
-  showToast("Ban revogado");
-  renderModeration();
+async function revokeBan(banDocId,banData){
+  if(!banData)return;
+  if(banData.type==="permanent"&&!isOwner()){showToast("Só o Creator pode revogar este banimento.");return;}
+  if(!canModerate())return;
+  try{
+    const b=db.batch();const patch={revoked:true,revokedAt:Date.now(),revokedBy:currentUser.uid};
+    const banRef=db.collection("bans").doc(banDocId);b.set(banRef,patch,{merge:true});
+    if(banData.targetUid){
+      const uref=db.collection("users").doc(banData.targetUid);
+      const snap=await uref.get();
+      if(snap.exists)b.update(uref,{banned:false,banType:null,banUntil:null,banReason:null});
+    }
+    if(banData.targetEmail){
+      const emailId="email_"+String(banData.targetEmail).toLowerCase();
+      if(emailId!==banDocId)b.set(db.collection("bans").doc(emailId),patch,{merge:true});
+    }
+    if(banData.targetUid){
+      const uidId="uid_"+banData.targetUid;
+      if(uidId!==banDocId)b.set(db.collection("bans").doc(uidId),patch,{merge:true});
+    }
+    await b.commit();showToast("Banimento revogado");
+  }catch(err){console.error(err);showToast("Não foi possível revogar o banimento.");}
 }
 async function blockUser(uid){
-  if(!currentUser||!userProfile||uid===currentUser.uid) return;
+  if(!currentUser||!userProfile||uid===currentUser.uid)return;
   ensureArrays(userProfile);
-  if(userProfile.blocked.includes(uid)){ showToast("Já bloqueado"); return; }
-  userProfile.blocked=[...userProfile.blocked,uid];
-  userProfile.friends=(userProfile.friends||[]).filter(id=>id!==uid);
-  userProfile.outgoingRequests=(userProfile.outgoingRequests||[]).filter(id=>id!==uid);
-  userProfile.incomingRequests=(userProfile.incomingRequests||[]).filter(r=>r.uid!==uid);
-  userProfile.following=(userProfile.following||[]).filter(id=>id!==uid);
-  await db.collection("users").doc(currentUser.uid).set({
-    blocked:userProfile.blocked, friends:userProfile.friends,
-    outgoingRequests:userProfile.outgoingRequests, incomingRequests:userProfile.incomingRequests,
-    following:userProfile.following
-  },{merge:true});
+  if(userProfile.blocked.includes(uid))return;
   try{
-    const other=await db.collection("users").doc(uid).get();
-    if(other.exists){
-      const d=other.data();
-      await db.collection("users").doc(uid).set({
-        friends:(d.friends||[]).filter(id=>id!==currentUser.uid),
-        outgoingRequests:(d.outgoingRequests||[]).filter(id=>id!==currentUser.uid),
-        incomingRequests:(d.incomingRequests||[]).filter(r=>r.uid!==currentUser.uid),
-        following:(d.following||[]).filter(id=>id!==currentUser.uid)
-      },{merge:true});
-    }
-  }catch{}
-  showToast("Usuário bloqueado");
-  if(location.hash.startsWith("#user/")) renderPublicProfile(uid);
-  renderProfile(); renderMailbox();
+    if(userProfile.friends.includes(uid))await removeFriend(uid);
+    if(userProfile.following.includes(uid))await unfollowUser(uid);
+    const blocked=[...new Set([...userProfile.blocked,uid])];
+    await db.collection("users").doc(currentUser.uid).update({blocked});
+    userProfile.blocked=blocked;showToast("Usuário bloqueado");
+    if(location.hash.startsWith("#user/"))renderPublicProfile(uid);
+    renderProfile();renderMailbox();
+  }catch(e){console.error(e);showToast("Não foi possível bloquear.");}
 }
 async function unblockUser(uid){
   if(!currentUser||!userProfile) return;
@@ -1519,19 +1519,17 @@ function isBlockedEither(uid, theirData){
   return false;
 }
 async function rejectFriendRequest(fromUid){
-  if(!currentUser||!userProfile) return;
-  const myIncoming=(userProfile.incomingRequests||[]).filter(r=>r.uid!==fromUid);
-  userProfile.incomingRequests=myIncoming;
-  await db.collection("users").doc(currentUser.uid).set({incomingRequests:myIncoming},{merge:true});
+  if(!currentUser||!userProfile)return;
+  const request=userProfile.incomingRequests.find(r=>r.uid===fromUid);
+  if(!request)return;
   try{
-    const other=await db.collection("users").doc(fromUid).get();
-    if(other.exists){
-      const out=(other.data().outgoingRequests||[]).filter(id=>id!==currentUser.uid);
-      await db.collection("users").doc(fromUid).set({outgoingRequests:out},{merge:true});
-    }
-  }catch{}
-  showToast("Pedido recusado");
-  renderMailbox(); renderProfile();
+    const b=db.batch();
+    b.update(db.collection("users").doc(currentUser.uid),{incomingRequests:firebase.firestore.FieldValue.arrayRemove(request)});
+    b.update(db.collection("users").doc(fromUid),{outgoingRequests:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});
+    await b.commit();
+    userProfile.incomingRequests=userProfile.incomingRequests.filter(r=>r.uid!==fromUid);
+    showToast("Pedido recusado");renderMailbox();renderProfile();
+  }catch(e){console.error(e);showToast("Não foi possível recusar o pedido.");}
 }
 function renderMailbox(){
   const guest=document.getElementById("mailbox-guest");
@@ -1661,28 +1659,15 @@ function isAccountIdToken(s){
   return /^(FW|CW)-[A-Z0-9]{4,12}$/i.test(String(s||"").replace(/^@/,"").trim());
 }
 async function resolveAccountId(idRaw){
-  const id = normalizeAccountId(idRaw);
-  if(!id) return null;
-  if(mentionCache[id]) return mentionCache[id];
+  const id=normalizeAccountId(idRaw);
+  if(!isAccountIdToken(id))return null;
+  if(mentionCache[id])return mentionCache[id];
   try{
-    let snap = await db.collection("users").where("accountId","==",id).limit(1).get();
-    if(snap.empty){
-      // try original casing from profile (some old FW ids mixed)
-      const all = await db.collection("users").limit(100).get();
-      let found = null;
-      all.forEach(doc=>{
-        const aid = (doc.data().accountId||"").toUpperCase();
-        if(aid===id) found = {uid:doc.id, name:doc.data().displayName||id, accountId:doc.data().accountId};
-      });
-      if(found){ mentionCache[id]=found; return found; }
-      return null;
-    }
-    const doc = snap.docs[0];
-    const d = doc.data();
-    const out = {uid:doc.id, name:d.displayName||id, accountId:d.accountId};
-    mentionCache[id]=out;
-    return out;
-  }catch(e){ console.error(e); return null; }
+    const snap=await db.collection("public_profiles").where("accountId","==",id).limit(1).get();
+    if(snap.empty)return null;
+    const doc=snap.docs[0],d=doc.data();
+    return mentionCache[id]={uid:doc.id,name:d.displayName||id,displayName:d.displayName||id,accountId:d.accountId};
+  }catch(e){console.warn("Busca de ID falhou",e);return null;}
 }
 function escHtml(t){
   return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -1721,8 +1706,8 @@ function renderProfileLinks(container, links){
   const list = Array.isArray(links) ? links.filter(l=>l && l.url) : [];
   if(!list.length){ container.innerHTML = ""; return; }
   container.innerHTML = list.map(l=>{
-    let url = String(l.url||"").trim();
-    if(url && !/^https?:\/\//i.test(url)) url = "https://"+url;
+    let url = safeExternalLink(l.url);
+    if(!url) return "";
     const title = (l.title||url).trim() || url;
     const icon = /instagram/i.test(url)?"📸":/tiktok/i.test(url)?"🎵":/twitter|x\\.com/i.test(url)?"🐦":/youtube/i.test(url)?"▶️":/spotify/i.test(url)?"🎧":/linktr/i.test(url)?"🔗":"🔗";
     return `<a class="profile-link" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">${icon} ${escHtml(title)}</a>`;
@@ -1770,6 +1755,38 @@ function ensureArrays(p){
   if(typeof p.followersCount!=="number") p.followersCount=(p.followersCount||0);
 }
 
+
+// Perfil público separado dos campos privados (e-mail, bloqueios, amizades ocultas).
+function publicProfileData(p){
+  const d=p||{};
+  const data={
+    displayName:String(d.displayName||"Usuário").slice(0,100),
+    bio:String(d.bio||"").slice(0,1500),
+    accountId:String(d.accountId||"").slice(0,32),
+    photoURL:safeImageUrl(d.photoURL)||null,
+    bannerURL:safeImageUrl(d.bannerURL)||null,
+    links:Array.isArray(d.links)?d.links:[],
+    role:["owner","moderator"].includes(d.role)?d.role:"user",
+    hideFriends:!!d.hideFriends,
+    friendsCount:Array.isArray(d.friends)?d.friends.length:0,
+    friends:d.hideFriends?[]:(Array.isArray(d.friends)?d.friends.slice(0,500):[]),
+    followersCount:Number(d.followersCount)||0,
+    followingCount:Array.isArray(d.following)?d.following.length:0
+  };
+  return data;
+}
+async function syncPublicProfile(){
+  if(!currentUser||!userProfile)return;
+  try{
+    await db.collection("public_profiles").doc(currentUser.uid).set(publicProfileData(userProfile),{merge:true});
+  }catch(e){console.warn("Falha ao sincronizar perfil público",e);}
+}
+async function publicProfile(uid){
+  if(uid===currentUser?.uid && userProfile)return {uid,...publicProfileData(userProfile)};
+  const doc=await db.collection("public_profiles").doc(uid).get();
+  return doc.exists?{uid,...doc.data()}:null;
+}
+
 async function loadUserProfile(uid){
   try{
     const u=auth.currentUser;
@@ -1802,6 +1819,7 @@ async function loadUserProfile(uid){
         userProfile.role="moderator";
       }
     }catch(e){ console.warn("Não foi possível sincronizar role (rules):", e.message||e); }
+    await syncPublicProfile();
   }catch(e){
     console.error(e);
     userProfile={uid,displayName:auth.currentUser?.email||"Usuário",bio:"",role:"user",friends:[],following:[],followersCount:0,hideFriends:false,accountId:generateAccountId()};
@@ -1902,6 +1920,10 @@ async function handleRegister(e){
       incomingRequests:[],outgoingRequests:[],hideFriends:false,blocked:[],
       banned:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
+    userProfile=null;
+    const created=await db.collection("users").doc(cred.user.uid).get();
+    userProfile={uid:cred.user.uid,...created.data()};
+    await syncPublicProfile();
     closeAuth(); showToast("Conta criada no CatWeb");
   }catch(err){
     errEl.textContent=authErrorMsg(err); errEl.classList.remove("hidden");
@@ -2097,11 +2119,11 @@ function renderProfile(){
   document.getElementById("stat-following").textContent=String((p.following||[]).length);
 
   const banner=document.getElementById("profile-banner-el");
-  if(p.bannerURL){ banner.innerHTML=`<img src="${esc(p.bannerURL)}" alt="">`; banner.style.background=""; }
+  if(p.bannerURL){ banner.innerHTML=`<img src="${imageAttr(p.bannerURL)}" alt="">`; banner.style.background=""; }
   else { banner.innerHTML=""; banner.style.background="linear-gradient(135deg,#3a1a1a,var(--accent))"; }
 
   const av=document.getElementById("profile-avatar-el");
-  if(p.photoURL) av.innerHTML=`<img src="${esc(p.photoURL)}" alt="">`;
+  if(p.photoURL) av.innerHTML=`<img src="${imageAttr(p.photoURL)}" alt="">`;
   else { av.textContent=getInitials(name); av.style.background="var(--accent)"; }
 
   // menu
@@ -2147,7 +2169,7 @@ async function renderFriendsPanel(opts){
   try{
     const users=[];
     for(let i=0;i<ids.length;i+=10){
-      const snaps=await Promise.all(ids.slice(i,i+10).map(id=>db.collection("users").doc(id).get()));
+      const snaps=await Promise.all(ids.slice(i,i+10).map(id=>db.collection("public_profiles").doc(id).get()));
       snaps.forEach(s=>{if(s.exists) users.push({uid:s.id,...s.data()});});
     }
     let page=1;
@@ -2158,7 +2180,7 @@ async function renderFriendsPanel(opts){
       const current=filtered.slice((page-1)*10,page*10);
       list.innerHTML=current.map(u=>{
         const name=u.displayName||"Usuário";
-        const av=u.photoURL?`<img src="${esc(u.photoURL)}" alt="">`:`<div class="friend-av">${esc(getInitials(name))}</div>`;
+        const av=u.photoURL?`<img src="${imageAttr(u.photoURL)}" alt="">`:`<div class="friend-av">${esc(getInitials(name))}</div>`;
         return `<div class="friend-row" data-uid="${esc(u.uid)}">${av}<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.9rem">${esc(name)}</div><div style="font-size:.75rem;color:var(--muted)">@${esc(u.accountId||"")}</div></div>${canRemove?`<button class="btn btn-secondary btn-sm" data-unfriend="${esc(u.uid)}">Remover</button>`:""}</div>`;
       }).join("") || '<div class="friends-private">Nenhum resultado encontrado.</div>';
       if(pager) pager.innerHTML=pages>1?`<button type="button" data-page="${page-1}" ${page===1?"disabled":""}>Anterior</button>${Array.from({length:pages},(_,i)=>`<button type="button" class="${page===i+1?"active":""}" data-page="${i+1}">${i+1}</button>`).join("")}<button type="button" data-page="${page+1}" ${page===pages?"disabled":""}>Próxima</button>`:"";
@@ -2172,98 +2194,80 @@ async function renderFriendsPanel(opts){
 }
 
 async function removeFriend(uid){
-  if(!currentUser||!userProfile) return;
-  userProfile.friends=(userProfile.friends||[]).filter(id=>id!==uid);
-  await db.collection("users").doc(currentUser.uid).set({friends:userProfile.friends},{merge:true});
+  if(!currentUser||!userProfile||!userProfile.friends?.includes(uid))return;
   try{
-    const other=await db.collection("users").doc(uid).get();
-    if(other.exists){
-      const f=(other.data().friends||[]).filter(id=>id!==currentUser.uid);
-      await db.collection("users").doc(uid).set({friends:f},{merge:true});
-    }
-  }catch{}
-  showToast("Amigo removido");
-  renderProfile();
+    const b=db.batch();
+    b.update(db.collection("users").doc(currentUser.uid),{friends:firebase.firestore.FieldValue.arrayRemove(uid),lastFriendPeer:uid});
+    b.update(db.collection("users").doc(uid),{friends:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});
+    await b.commit();
+    userProfile.friends=userProfile.friends.filter(x=>x!==uid);
+    await syncPublicProfile();showToast("Amizade removida");renderProfile();
+    if(location.hash.startsWith("#user/"))renderPublicProfile(uid);
+  }catch(e){console.error(e);showToast("Não foi possível remover amizade.");}
 }
 
 async function sendFriendRequest(uid){
-  if(!currentUser||!userProfile){ showToast("Faça login"); return; }
-  if(uid===currentUser.uid) return;
+  if(!currentUser||!userProfile||uid===currentUser.uid)return;
   ensureArrays(userProfile);
-  if(userProfile.blocked.includes(uid)){ showToast("Você bloqueou esta pessoa"); return; }
-  if((userProfile.friends||[]).includes(uid)){ showToast("Já são amigos"); return; }
-  if((userProfile.outgoingRequests||[]).includes(uid)){ showToast("Pedido já enviado"); return; }
+  if(userProfile.blocked.includes(uid)||userProfile.friends.includes(uid)||userProfile.outgoingRequests.includes(uid))return;
   try{
-    const targetSnap=await db.collection("users").doc(uid).get();
-    if(!targetSnap.exists){ showToast("Usuário não encontrado"); return; }
-    const target=targetSnap.data();
-    if(Array.isArray(target.blocked) && target.blocked.includes(currentUser.uid)){ showToast("Não é possível enviar pedido"); return; }
-    const incoming=Array.isArray(target.incomingRequests)?[...target.incomingRequests]:[];
-    if(incoming.some(r=>r.uid===currentUser.uid)){ showToast("Pedido já enviado"); return; }
-    if((userProfile.incomingRequests||[]).some(r=>r.uid===uid)){
-      await acceptFriendRequest(uid); return;
-    }
-    incoming.push({
-      uid:currentUser.uid,
-      displayName:userProfile.displayName||"Usuário",
-      accountId:userProfile.accountId||"",
-      at:Date.now()
-    });
-    const outgoing=[...(userProfile.outgoingRequests||[]),uid];
-    userProfile.outgoingRequests=outgoing;
-    await db.collection("users").doc(uid).set({incomingRequests:incoming},{merge:true});
-    await db.collection("users").doc(currentUser.uid).set({outgoingRequests:outgoing},{merge:true});
-    showToast("Pedido de amizade enviado");
-    if(location.hash.startsWith("#user/")) renderPublicProfile(uid);
-  }catch(e){ showToast("Erro: "+(e.message||"")); }
+    if(!await publicProfile(uid))throw new Error("Usuário não encontrado");
+    if(userProfile.incomingRequests.some(r=>r.uid===uid)){await acceptFriendRequest(uid);return;}
+    const incoming={uid:currentUser.uid,displayName:userProfile.displayName||"Usuário",accountId:userProfile.accountId||"",at:Date.now()};
+    const b=db.batch();
+    b.update(db.collection("users").doc(uid),{incomingRequests:firebase.firestore.FieldValue.arrayUnion(incoming)});
+    b.update(db.collection("users").doc(currentUser.uid),{outgoingRequests:firebase.firestore.FieldValue.arrayUnion(uid),lastRequestPeer:uid});
+    await b.commit();userProfile.outgoingRequests.push(uid);
+    showToast("Pedido de amizade enviado");if(location.hash.startsWith("#user/"))renderPublicProfile(uid);
+  }catch(e){console.error(e);showToast("Não foi possível enviar o pedido.");}
 }
 
 async function acceptFriendRequest(fromUid){
-  if(!currentUser||!userProfile) return;
+  if(!currentUser||!userProfile)return;
+  const request=userProfile.incomingRequests.find(r=>r.uid===fromUid);
+  if(!request)return;
   try{
-    const fromSnap=await db.collection("users").doc(fromUid).get();
-    const fromData=fromSnap.exists?fromSnap.data():{};
-    let myFriends=[...(userProfile.friends||[])];
-    if(!myFriends.includes(fromUid)) myFriends.push(fromUid);
-    let myIncoming=(userProfile.incomingRequests||[]).filter(r=>r.uid!==fromUid);
-    let theirFriends=Array.isArray(fromData.friends)?[...fromData.friends]:[];
-    if(!theirFriends.includes(currentUser.uid)) theirFriends.push(currentUser.uid);
-    let theirOutgoing=(fromData.outgoingRequests||[]).filter(id=>id!==currentUser.uid);
-    userProfile.friends=myFriends;
-    userProfile.incomingRequests=myIncoming;
-    await db.collection("users").doc(currentUser.uid).set({friends:myFriends,incomingRequests:myIncoming},{merge:true});
-    await db.collection("users").doc(fromUid).set({friends:theirFriends,outgoingRequests:theirOutgoing},{merge:true});
-    showToast("Amizade aceita");
-    renderProfile();
-    if(location.hash.startsWith("#user/")) renderPublicProfile(fromUid);
-  }catch(e){ showToast("Erro ao aceitar"); }
+    const b=db.batch();
+    b.update(db.collection("users").doc(currentUser.uid),{
+      friends:firebase.firestore.FieldValue.arrayUnion(fromUid),
+      incomingRequests:firebase.firestore.FieldValue.arrayRemove(request),lastFriendPeer:fromUid
+    });
+    b.update(db.collection("users").doc(fromUid),{
+      friends:firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+      outgoingRequests:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
+    });
+    await b.commit();
+    userProfile.friends=[...new Set([...userProfile.friends,fromUid])];
+    userProfile.incomingRequests=userProfile.incomingRequests.filter(r=>r.uid!==fromUid);
+    await syncPublicProfile();showToast("Amizade aceita");renderProfile();renderMailbox();
+    if(location.hash.startsWith("#user/"))renderPublicProfile(fromUid);
+  }catch(e){console.error(e);showToast("Não foi possível aceitar o pedido.");}
 }
 
 async function followUser(uid){
-  if(!currentUser||!userProfile||uid===currentUser.uid) return;
-  if((userProfile.following||[]).includes(uid)){ showToast("Já segue"); return; }
+  if(!currentUser||!userProfile||uid===currentUser.uid||userProfile.following?.includes(uid))return;
   try{
-    const following=[...(userProfile.following||[]),uid];
-    userProfile.following=following;
-    await db.collection("users").doc(currentUser.uid).set({following},{merge:true});
-    await db.collection("users").doc(uid).set({followersCount:firebase.firestore.FieldValue.increment(1)},{merge:true});
-    showToast("Agora você segue esta pessoa");
-    if(location.hash.startsWith("#user/")) renderPublicProfile(uid);
-    renderProfile();
-  }catch(e){ showToast("Erro ao seguir"); }
+    const b=db.batch();
+    b.update(db.collection("users").doc(currentUser.uid),{following:firebase.firestore.FieldValue.arrayUnion(uid),lastFollowPeer:uid});
+    b.update(db.collection("users").doc(uid),{followersCount:firebase.firestore.FieldValue.increment(1)});
+    b.update(db.collection("public_profiles").doc(uid),{followersCount:firebase.firestore.FieldValue.increment(1)});
+    await b.commit();userProfile.following.push(uid);
+    await syncPublicProfile();showToast("Agora você segue esta pessoa");
+    if(location.hash.startsWith("#user/"))renderPublicProfile(uid);renderProfile();
+  }catch(e){console.error(e);showToast("Não foi possível seguir.");}
 }
 
 async function unfollowUser(uid){
-  if(!currentUser||!userProfile) return;
-  const following=(userProfile.following||[]).filter(id=>id!==uid);
-  userProfile.following=following;
-  await db.collection("users").doc(currentUser.uid).set({following},{merge:true});
+  if(!currentUser||!userProfile||!userProfile.following?.includes(uid))return;
   try{
-    await db.collection("users").doc(uid).set({followersCount:firebase.firestore.FieldValue.increment(-1)},{merge:true});
-  }catch{}
-  showToast("Deixou de seguir");
-  if(location.hash.startsWith("#user/")) renderPublicProfile(uid);
-  renderProfile();
+    const b=db.batch();
+    b.update(db.collection("users").doc(currentUser.uid),{following:firebase.firestore.FieldValue.arrayRemove(uid),lastFollowPeer:uid});
+    b.update(db.collection("users").doc(uid),{followersCount:firebase.firestore.FieldValue.increment(-1)});
+    b.update(db.collection("public_profiles").doc(uid),{followersCount:firebase.firestore.FieldValue.increment(-1)});
+    await b.commit();userProfile.following=userProfile.following.filter(x=>x!==uid);
+    await syncPublicProfile();showToast("Deixou de seguir");
+    if(location.hash.startsWith("#user/"))renderPublicProfile(uid);renderProfile();
+  }catch(e){console.error(e);showToast("Não foi possível deixar de seguir.");}
 }
 
 async function renderPublicProfile(uid){
@@ -2271,13 +2275,13 @@ async function renderPublicProfile(uid){
   if(!el) return;
   el.innerHTML=`<div class="placeholder-card"><p>Carregando perfil...</p></div>`;
   try{
-    const snap=await db.collection("users").doc(uid).get();
+    const snap=await db.collection("public_profiles").doc(uid).get();
     if(!snap.exists){ el.innerHTML=`<div class="placeholder-card"><p>Usuário não encontrado.</p></div>`; return; }
     const d=snap.data();
     const name=d.displayName||"Usuário";
     const isSelf=currentUser&&currentUser.uid===uid;
     if(userProfile) ensureArrays(userProfile);
-    const blockState=isBlockedEither(uid,d);
+    const blockState=isBlockedEither(uid,null);
     if(blockState){
       const youBlocked=blockState==="you";
       el.innerHTML=`
@@ -2311,9 +2315,9 @@ async function renderPublicProfile(uid){
     const pendingOut=userProfile&&(userProfile.outgoingRequests||[]).includes(uid);
     const isFollowing=userProfile&&(userProfile.following||[]).includes(uid);
     const hideFriends=!!d.hideFriends;
-    const friendsCount=(d.friends||[]).length;
-    const banner=d.bannerURL?`<img src="${esc(d.bannerURL)}" alt="">`:"";
-    const avatar=d.photoURL?`<img src="${esc(d.photoURL)}" alt="">`:getInitials(name);
+    const friendsCount=Number(d.friendsCount)||0;
+    const banner=d.bannerURL?`<img src="${imageAttr(d.bannerURL)}" alt="">`:"";
+    const avatar=d.photoURL?`<img src="${imageAttr(d.photoURL)}" alt="">`:getInitials(name);
 
     let actions="";
     if(currentUser&&!isSelf){
@@ -2351,7 +2355,7 @@ async function renderPublicProfile(uid){
           <div class="profile-stats">
             <button type="button" class="stat-link" id="pub-stat-friends"><strong>${friendsCount}</strong> <span>amigos</span></button>
             <div><strong>${d.followersCount||0}</strong> <span>seguidores</span></div>
-            <div><strong>${(d.following||[]).length}</strong> <span>seguindo</span></div>
+            <div><strong>${Number(d.followingCount)||0}</strong> <span>seguindo</span></div>
           </div>
           <div class="friends-panel hidden" id="pub-friends-panel">
             <div class="friends-panel-head"><strong>Lista de amizades</strong><button type="button" class="menu-dots" id="close-pub-friends" aria-label="Fechar lista">×</button></div>
@@ -2419,7 +2423,10 @@ function renderConfig(){
       userProfile.hideFriends=next;
       tog.classList.toggle("on",next);
       try{
-        await db.collection("users").doc(currentUser.uid).set({hideFriends:next},{merge:true});
+        const privacyBatch=db.batch();
+        privacyBatch.update(db.collection("users").doc(currentUser.uid),{hideFriends:next});
+        privacyBatch.set(db.collection("public_profiles").doc(currentUser.uid),publicProfileData(userProfile),{merge:true});
+        await privacyBatch.commit();
         showToast(next?"Lista de amigos oculta":"Lista de amigos visível");
       }catch(err){
         userProfile.hideFriends=previous;
@@ -2477,6 +2484,7 @@ async function handleEditProfile(e){
     await db.collection("users").doc(currentUser.uid).set(data,{merge:true});
     await currentUser.updateProfile({displayName:name});
     userProfile={...userProfile,...data};
+    await syncPublicProfile();
     // role permanece o que veio do servidor / Auth
     if(isOwner()) userProfile.role="owner";
     else if(isModerator()) userProfile.role="moderator";
@@ -2540,11 +2548,11 @@ async function searchUsers(qRaw){
     // By accountId exact
     if(/^(CW|FW)-/i.test(token)){
       const id=token.toUpperCase();
-      let snap=await db.collection("users").where("accountId","==",id).limit(10).get();
+      let snap=await db.collection("public_profiles").where("accountId","==",id).limit(10).get();
       snap.forEach(doc=>found.set(doc.id,{uid:doc.id,...doc.data()}));
       if(!found.size){
         // fallback scan small
-        const all=await db.collection("users").limit(80).get();
+        const all=await db.collection("public_profiles").limit(80).get();
         all.forEach(doc=>{
           const aid=(doc.data().accountId||"").toUpperCase();
           if(aid===id) found.set(doc.id,{uid:doc.id,...doc.data()});
@@ -2554,11 +2562,11 @@ async function searchUsers(qRaw){
       // By displayName (case-insensitive-ish: exact lower + prefix)
       const lower=token.toLowerCase();
       // exact displayName
-      let snap=await db.collection("users").where("displayName","==",token).limit(15).get();
+      let snap=await db.collection("public_profiles").where("displayName","==",token).limit(15).get();
       snap.forEach(doc=>found.set(doc.id,{uid:doc.id,...doc.data()}));
       // also try original casing variants common
       if(!found.size){
-        const all=await db.collection("users").limit(120).get();
+        const all=await db.collection("public_profiles").limit(120).get();
         all.forEach(doc=>{
           const d=doc.data();
           const name=String(d.displayName||"").toLowerCase().replace(/\s+/g,"");
@@ -2587,7 +2595,7 @@ async function searchUsers(qRaw){
   results.innerHTML=list.map(u=>{
     const name=u.displayName||"Usuário";
     const av=u.photoURL
-      ?`<div class="su-av"><img src="${esc(u.photoURL)}" alt=""></div>`
+      ?`<div class="su-av"><img src="${imageAttr(u.photoURL)}" alt=""></div>`
       :`<div class="su-av">${esc(getInitials(name))}</div>`;
     const badges=badgeHtmlForRole(roleOfProfile(u));
     const sub=[u.accountId?("ID: "+u.accountId):"", atHandle(u)].filter(Boolean).join(" · ");
@@ -2628,17 +2636,9 @@ function stopChatListener(){
   if(chatUnsub){ try{ chatUnsub(); }catch{} chatUnsub=null; }
 }
 
-async function areMutualFriends(uidA, uidB){
-  if(!uidA||!uidB||uidA===uidB) return false;
-  // Não esconder erros de permissão: o envio precisa exibir a causa real.
-  const [a,b] = await Promise.all([
-    db.collection("users").doc(uidA).get(),
-    db.collection("users").doc(uidB).get()
-  ]);
-  if(!a.exists||!b.exists) return false;
-  const fa=a.data().friends||[];
-  const fb=b.data().friends||[];
-  return fa.includes(uidB) && fb.includes(uidA);
+async function areMutualFriends(uidA,uidB){
+  if(!currentUser||!userProfile||uidA!==currentUser.uid||uidA===uidB)return false;
+  return Array.isArray(userProfile.friends)&&userProfile.friends.includes(uidB);
 }
 
 async function ensureChatDoc(peerUid){
@@ -2698,7 +2698,7 @@ async function renderChatList(){
   }
   list.innerHTML=`<div class="chat-empty">Carregando...</div>`;
   try{
-    const snaps = await Promise.all(friends.map(id=>db.collection("users").doc(id).get()));
+    const snaps = await Promise.all(friends.map(id=>db.collection("public_profiles").doc(id).get()));
     // last messages from chat docs
     const rows=[];
     for(const snap of snaps){
@@ -2727,7 +2727,7 @@ async function renderChatList(){
     list.innerHTML=rows.map(r=>{
       const name=r.d.displayName||"Usuário";
       const av=r.d.photoURL
-        ?`<div class="cf-av"><img src="${esc(r.d.photoURL)}" alt=""></div>`
+        ?`<div class="cf-av"><img src="${imageAttr(r.d.photoURL)}" alt=""></div>`
         :`<div class="cf-av">${esc(getInitials(name))}</div>`;
       const active=activeChatPeer&&activeChatPeer.uid===r.uid?" active":"";
       return `<div class="chat-friend-row${active}" data-peer="${esc(r.uid)}">
@@ -2754,7 +2754,7 @@ async function openChatWith(peerUid){
     return;
   }
   try{
-    const snap=await db.collection("users").doc(peerUid).get();
+    const snap=await db.collection("public_profiles").doc(peerUid).get();
     if(!snap.exists){ showToast("Usuário não encontrado"); return; }
     const d=snap.data();
     // cria o doc do chat ANTES de abrir a UI
@@ -2763,7 +2763,7 @@ async function openChatWith(peerUid){
     document.getElementById("chat-peer-name").textContent=activeChatPeer.displayName;
     const av=document.getElementById("chat-peer-av");
     if(av){
-      if(activeChatPeer.photoURL) av.innerHTML=`<img src="${esc(activeChatPeer.photoURL)}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+      if(activeChatPeer.photoURL) av.innerHTML=`<img src="${imageAttr(activeChatPeer.photoURL)}" alt="" style="width:100%;height:100%;object-fit:cover">`;
       else av.textContent=getInitials(activeChatPeer.displayName);
     }
     document.getElementById("chat-input").disabled=false;
@@ -2927,7 +2927,7 @@ function feedTime(ts){
 }
 function feedAuthorName(post){return post.authorName||post.displayName||"Usuário do CatWeb";}
 function feedAvatarHtml(url,name){
-  if(url) return `<div class="feed-avatar"><img src="${esc(url)}" alt=""></div>`;
+  if(url) return `<div class="feed-avatar"><img src="${imageAttr(url)}" alt=""></div>`;
   return `<div class="feed-avatar">${esc(getInitials(name)||"✦")}</div>`;
 }
 function feedTextHtml(text){
@@ -2954,18 +2954,22 @@ function bindFeedMentions(root){
 }
 async function sendFeedNotification(recipientUid,type,post,extra={}){
   if(!currentUser||!recipientUid||recipientUid===currentUser.uid)return;
+  const eventId=String(extra.eventId|| (type==="like"?currentUser.uid:post?.id)||"");
+  const postId=String(post?.id||extra.postId||"");
+  if(!eventId||!postId)return;
+  const docId=[currentUser.uid,type,postId,eventId,recipientUid].join("_");
   try{
     const actorName=userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0];
-    await db.collection("users").doc(recipientUid).collection("notifications").add({
+    await db.collection("users").doc(recipientUid).collection("notifications").doc(docId).set({
       recipientId:recipientUid,actorId:currentUser.uid,actorName,actorAccountId:userProfile?.accountId||"",
-      type,postId:post?.id||extra.postId||"",postText:String(post?.text||extra.postText||"").slice(0,180),
+      type,postId,eventId,postText:String(post?.text||extra.postText||"").slice(0,180),
       message:String(extra.message||"").slice(0,180),createdAt:firebase.firestore.FieldValue.serverTimestamp(),read:false
     });
   }catch(err){console.warn("Notificação não enviada:",err?.code||err?.message||err);}
 }
-async function notifyMentionedUsers(text,post,context="post"){
+async function notifyMentionedUsers(text,post,context="post",eventId=null){
   const ids=[...new Set((String(text||"").match(/@((?:FW|CW)-[A-Za-z0-9]{4,12})/gi)||[]).map(x=>normalizeAccountId(x)))];
-  for(const id of ids){const info=await resolveAccountId(id);if(info)await sendFeedNotification(info.uid,"mention",post,{message:context==="comment"?"mencionou você em uma resposta":"mencionou você em uma publicação"});}
+  for(const id of ids){const info=await resolveAccountId(id);if(info)await sendFeedNotification(info.uid,"mention",post,{eventId:eventId||post.id,message:context==="comment"?"mencionou você em uma resposta":"mencionou você em uma publicação"});}
 }
 function notificationMessage(n){
   const name=esc(n.actorName||"Alguém");
@@ -3027,7 +3031,7 @@ function updateComposerIdentity(){
   const handle=document.getElementById("composer-handle"), nameEl=document.getElementById("composer-name"), avatar=document.getElementById("composer-avatar");
   if(nameEl) nameEl.textContent=currentUser?name:"Sua voz no CatWeb";
   if(handle) handle.textContent=currentUser?(userProfile?.accountId?`@${userProfile.accountId}`:"Compartilhe um pensamento"):"Entre para participar do círculo";
-  if(avatar) avatar.innerHTML=currentUser&&userProfile?.photoURL?`<img src="${esc(userProfile.photoURL)}" alt="">`:esc(getInitials(name)||"✦");
+  if(avatar) avatar.innerHTML=currentUser&&userProfile?.photoURL?`<img src="${imageAttr(userProfile.photoURL)}" alt="">`:esc(getInitials(name)||"✦");
   const logged=!!currentUser;
   if(document.getElementById("post-composer-text")) document.getElementById("post-composer-text").disabled=!logged;
   if(document.getElementById("post-publish-btn")) document.getElementById("post-publish-btn").disabled=!logged;
@@ -3048,7 +3052,7 @@ async function createFeedPost(e){
   if(!currentUser){showToast("Entre na sua conta para publicar.");return;}
   if(!text){showToast("Escreva algo antes de publicar.");input?.focus();return;}
   if(text.length>POST_MAX_CHARS){showToast(`Máximo de ${POST_MAX_CHARS} caracteres.`);return;}
-  if(userProfile?.banned){showToast("Sua conta não pode publicar no momento.");return;}
+  if(accountIsSuspended(userProfile)){showToast("Sua conta não pode publicar no momento.");return;}
   if(btn){btn.disabled=true;btn.dataset.oldText=btn.innerHTML;btn.textContent="Publicando…";}
   try{
     const doc={
@@ -3155,7 +3159,7 @@ async function loadOriginalRepost(post,card){
 }
 async function togglePostLike(post,card){
   if(!currentUser){showToast("Entre na sua conta para curtir.");return;}
-  if(userProfile?.banned){showToast("Sua conta não pode interagir no momento.");return;}
+  if(accountIsSuspended(userProfile)){showToast("Sua conta não pode interagir no momento.");return;}
   const btn=card.querySelector('[data-post-action="like"]');btn.disabled=true;
   const likeRef=db.collection("posts").doc(post.id).collection("likes").doc(currentUser.uid);
   const postRef=db.collection("posts").doc(post.id);
@@ -3225,7 +3229,7 @@ function commentElement(comment,post,card){
       const nameNow=userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0];
       const batch=db.batch();
       batch.set(ref,{text:comment.text||"",commentary:"",authorId:currentUser.uid,authorName:nameNow,authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,type:"repost",repostOf:post.id,originalAuthorId:comment.authorId||post.authorId,originalAuthorName:author,createdAt:firebase.firestore.FieldValue.serverTimestamp(),likesCount:0,commentsCount:0,repostsCount:0,quotedCommentId:comment.id});
-      batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1)});
+      batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1),lastRepostId:ref.id});
       await batch.commit();showToast("Resposta repostada.");resetFeed();
     }catch(err){console.error(err);showToast("Não foi possível repostar essa resposta. Confira as regras do Firestore.");}
   });
@@ -3234,18 +3238,20 @@ function commentElement(comment,post,card){
 async function createPostComment(e,post,card){
   e.preventDefault();const input=card.querySelector(".comment-input"),btn=card.querySelector(".comment-form button"),text=(input?.value||"").trim();
   if(!currentUser){showToast("Entre na sua conta para responder.");return;}
-  if(userProfile?.banned){showToast("Sua conta não pode interagir no momento.");return;}
+  if(accountIsSuspended(userProfile)){showToast("Sua conta não pode interagir no momento.");return;}
   if(!text)return;if(text.length>500){showToast("A resposta pode ter no máximo 500 caracteres.");return;}
   btn.disabled=true;
   try{
     const target=feedReplyTargets[post.id];
     const comment={text,authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,parentId:target?.id||null,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-    const commentRef=await db.collection("posts").doc(post.id).collection("comments").add(comment);
-    await db.collection("posts").doc(post.id).update({commentsCount:firebase.firestore.FieldValue.increment(1)});
+    const commentRef=db.collection("posts").doc(post.id).collection("comments").doc();
+    const cb=db.batch();cb.set(commentRef,comment);
+    cb.update(db.collection("posts").doc(post.id),{commentsCount:firebase.firestore.FieldValue.increment(1),lastCommentId:commentRef.id});
+    await cb.commit();
     const notificationPost={...post,id:post.id};
-    await sendFeedNotification(post.authorId,target?"reply":"comment",notificationPost,{message:text});
-    if(target){const parentSnap=await db.collection("posts").doc(post.id).collection("comments").doc(target.id).get();if(parentSnap.exists)await sendFeedNotification(parentSnap.data().authorId,"reply",notificationPost,{message:text});}
-    await notifyMentionedUsers(text,notificationPost,"comment");
+    await sendFeedNotification(post.authorId,target?"reply":"comment",notificationPost,{message:text,eventId:commentRef.id});
+    if(target){const parentSnap=await db.collection("posts").doc(post.id).collection("comments").doc(target.id).get();if(parentSnap.exists)await sendFeedNotification(parentSnap.data().authorId,"reply",notificationPost,{message:text,eventId:commentRef.id});}
+    await notifyMentionedUsers(text,notificationPost,"comment",commentRef.id);
     if(input)input.value="";delete feedReplyTargets[post.id];
     const note=card.querySelector(".comment-replying");note?.classList.add("hidden");
     const count=card.querySelector(".comment-count");if(count)count.textContent=String((Number(count.textContent)||0)+1);
@@ -3257,14 +3263,14 @@ async function createPostComment(e,post,card){
 }
 async function repostPost(post){
   if(!currentUser){showToast("Entre na sua conta para repostar.");return;}
-  if(userProfile?.banned){showToast("Sua conta não pode interagir no momento.");return;}
+  if(accountIsSuspended(userProfile)){showToast("Sua conta não pode interagir no momento.");return;}
   try{
     const ref=db.collection("posts").doc();
     const batch=db.batch();
     const commentary=(prompt("Escreva algo sobre esta publicação (opcional):","")||"").trim();
     batch.set(ref,{text:post.text||"",commentary,authorId:currentUser.uid,authorName:userProfile?.displayName||currentUser.displayName||(currentUser.email||"Usuário").split("@")[0],authorAccountId:userProfile?.accountId||"",authorPhotoURL:userProfile?.photoURL||null,type:"repost",repostOf:post.id,originalAuthorId:post.authorId,originalAuthorName:feedAuthorName(post),createdAt:firebase.firestore.FieldValue.serverTimestamp(),likesCount:0,commentsCount:0,repostsCount:0});
-    batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1)});
-    await batch.commit();await sendFeedNotification(post.authorId,"repost",post,{});showToast("Publicação repostada.");resetFeed();
+    batch.update(db.collection("posts").doc(post.id),{repostsCount:firebase.firestore.FieldValue.increment(1),lastRepostId:ref.id});
+    await batch.commit();await sendFeedNotification(post.authorId,"repost",post,{eventId:ref.id});showToast("Publicação repostada.");resetFeed();
   }catch(err){console.error("Falha ao repostar:",err);showToast(err?.code==="permission-denied"?"As regras do Firestore precisam permitir reposts.":"Não foi possível repostar.");}
 }
 async function deletePost(post,card){
