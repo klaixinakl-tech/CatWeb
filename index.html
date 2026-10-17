@@ -1234,6 +1234,21 @@ body{
 .cw-mention-panel button:hover{background:var(--bg-alt)}
 @media(max-width:750px){.cw-circles-columns{grid-template-columns:1fr}.cw-circles-shell{padding-top:12px}.cw-panel{padding:17px}}
 
+
+/* Alpha 0.9.2.3 — concessão de insígnias */
+.cw-badges-editor{margin-top:18px;padding:18px;border:1px solid rgba(209,176,113,.3);border-radius:22px;background:linear-gradient(145deg,rgba(58,36,62,.22),rgba(20,14,27,.18))}
+.cw-badges-editor h3{font:600 1.25rem var(--font-body);letter-spacing:.03em;margin:0 0 5px;color:var(--ink)}
+.cw-badges-editor>p{font:.82rem/1.5 var(--font-ui);color:var(--muted);margin-bottom:12px}
+.cw-badges-choice{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid rgba(209,176,113,.12);cursor:pointer}
+.cw-badges-choice:last-child{border-bottom:0}
+.cw-badges-choice input{flex-shrink:0;width:18px;height:18px;accent-color:var(--accent)}
+.cw-badges-choice .role-badge{pointer-events:none;width:30px;height:30px}
+.cw-badges-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.cw-badges-copy strong{font:600 .88rem var(--font-ui);color:var(--ink)}
+.cw-badges-copy small{font:.76rem/1.4 var(--font-ui);color:var(--muted)}
+.cw-badges-tools{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+.cw-badges-feedback{font:.78rem var(--font-ui);color:var(--muted);margin-top:10px}
+@media(max-width:600px){.cw-badges-editor{padding:13px}.cw-badges-choice{gap:9px}}
 </style>
 </head>
 <body>
@@ -2352,7 +2367,8 @@ function publicProfileData(p){
     friendsCount:Array.isArray(d.friends)?d.friends.length:0,
     friends:d.hideFriends?[]:(Array.isArray(d.friends)?d.friends.slice(0,500):[]),
     followersCount:Number(d.followersCount)||0,
-    followingCount:Array.isArray(d.following)?d.following.length:0
+    followingCount:Array.isArray(d.following)?d.following.length:0,
+    badges:Array.isArray(d.badges)?d.badges.filter(k=>BADGE_LIBRARY[k] && !["creator","moderator"].includes(k)).slice(0,7):[]
   };
   return data;
 }
@@ -2934,6 +2950,7 @@ async function renderPublicProfile(uid){
                 <button type="button" data-copy="at">Copiar @</button>
                 ${currentUser&&!isSelf?`<button type="button" data-block="1">Bloquear</button>`:""}
                 ${currentUser&&!isSelf&&canModerate()?`<button type="button" data-ban="1">Banir</button>`:""}
+                ${isOwner()&&!isSelf?`<button type="button" data-badges-manage="1">✧ Gerenciar insígnias</button>`:""}
               </div>
             </div>
           </div>
@@ -2954,6 +2971,7 @@ async function renderPublicProfile(uid){
             <div id="pub-friends-pagination" class="friends-pagination"></div>
           </div>
           <div class="profile-actions">${actions}<button type="button" class="btn btn-secondary btn-sm" id="cw-report-user" data-report-user="${esc(uid)}">⚑ Denunciar perfil</button></div>
+          ${isOwner()&&!isSelf?`<div id="cw-badges-editor" class="cw-badges-editor hidden" aria-label="Gerenciar insígnias"></div>`:""}
         </div>
       </div>`;
     renderProfileActivity(uid,"public-profile-activity",false);
@@ -2976,6 +2994,9 @@ async function renderPublicProfile(uid){
     drop?.querySelector("[data-ban]")?.addEventListener("click",e=>{
       e.stopPropagation(); drop.classList.add("hidden");
       openBanModal({uid,displayName:name,accountId:d.accountId,email:d.email,at:atHandle(d)});
+    });
+    drop?.querySelector("[data-badges-manage]")?.addEventListener("click",e=>{
+      e.stopPropagation();drop.classList.add("hidden");openBadgeEditor(uid,d);
     });
     document.getElementById("pub-friend")?.addEventListener("click",()=>sendFriendRequest(uid));
     document.getElementById("pub-unfriend")?.addEventListener("click",()=>removeFriend(uid));
@@ -4268,21 +4289,78 @@ function runCatWebTests(){
       :"Este navegador não oferece os recursos necessários para compactar imagens");
 }
 
+
+const CATWEB_GRANTABLE_BADGES = Object.freeze([
+  {id:"early_soul",description:"Para contas da época anterior à abertura oficial do CatWeb."},
+  {id:"founding_member",description:"Membros reconhecidos do núcleo fundador."},
+  {id:"beta_tester",description:"Participou dos testes e ajudou a melhorar o site."},
+  {id:"chronicler",description:"Contribuiu com relatos, ideias e registros da comunidade."},
+  {id:"artist",description:"Ajudou o CatWeb ou a comunidade com arte e criação."},
+  {id:"patron",description:"Ofereceu apoio importante ao projeto."},
+  {id:"circle_heart",description:"Participação especial no círculo social."}
+]);
+function openBadgeEditor(uid,publicData){
+  if(!isOwner()||!currentUser||uid===currentUser.uid)return;
+  const box=document.getElementById("cw-badges-editor");
+  if(!box)return;
+  box.classList.remove("hidden");box.replaceChildren();
+  const title=document.createElement("h3");title.textContent="✦ Conceder insígnias";
+  const text=document.createElement("p");text.textContent="Somente o Creator pode conceder ou retirar estas insígnias. Cargos de Creator e Moderator não são distribuídos aqui.";
+  const choices=document.createElement("div");
+  const selected=new Set(Array.isArray(publicData.badges)?publicData.badges:[]);
+  for(const item of CATWEB_GRANTABLE_BADGES){
+    const label=document.createElement("label");label.className="cw-badges-choice";
+    const input=document.createElement("input");input.type="checkbox";input.value=item.id;input.checked=selected.has(item.id);
+    const emblem=document.createElement("span");emblem.innerHTML=badgeHtml(item.id);
+    const copy=document.createElement("span");copy.className="cw-badges-copy";
+    const strong=document.createElement("strong");strong.textContent=BADGE_LIBRARY[item.id].label;
+    const small=document.createElement("small");small.textContent=item.description;
+    copy.append(strong,small);label.append(input,emblem,copy);choices.appendChild(label);
+  }
+  const tools=document.createElement("div");tools.className="cw-badges-tools";
+  const cancel=document.createElement("button");cancel.type="button";cancel.className="btn btn-secondary";cancel.textContent="Cancelar";
+  const save=document.createElement("button");save.type="button";save.className="btn btn-primary";save.textContent="Salvar insígnias";
+  const message=document.createElement("p");message.className="cw-badges-feedback";message.setAttribute("aria-live","polite");
+  cancel.onclick=()=>box.classList.add("hidden");
+  save.onclick=async()=>{
+    if(!isOwner()||!currentUser)return;
+    const keys=[...choices.querySelectorAll('input[type="checkbox"]:checked')].map(i=>i.value);
+    save.disabled=true;cancel.disabled=true;message.textContent="Salvando as insígnias...";
+    try{
+      const targetPrivate=db.collection("users").doc(uid);
+      const targetPublic=db.collection("public_profiles").doc(uid);
+      // Faz ambas as atualizações de uma vez: as Rules comparam os documentos após o batch.
+      const batch=db.batch();batch.update(targetPrivate,{badges:keys});batch.update(targetPublic,{badges:keys});
+      await batch.commit();
+      message.textContent="Insígnias atualizadas com sucesso.";showToast("Insígnias salvas!");
+      // Recarrega o perfil, inclusive os selos do nome.
+      await renderPublicProfile(uid);
+    }catch(e){
+      console.error("Falha ao conceder insígnias:",e);
+      message.textContent=e?.code==="permission-denied"?"Permissão negada. Publique também as regras Alpha 0.9.2.3 no Firebase.":"Não foi possível salvar. Confira sua conexão e tente novamente.";
+      save.disabled=false;cancel.disabled=false;
+    }
+  };
+  tools.append(cancel,save);box.append(title,text,choices,tools,message);
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
 // ALTERE ESTE OBJETO A CADA NOVA VERSÃO. A página Avisos e o selo do logo usam a mesma fonte.
 const CATWEB_RELEASE = Object.freeze({
-  version: "Alpha 0.9.2.2",
-  date: "16 de outubro de 2026",
-  isoDate: "2026-10-16",
-  title: "Insígnias do Círculo",
-  description: "Reforçamos a identidade visual do CatWeb com um novo sistema de insígnias: Creator e Moderator foram redesenhadas e o site agora já traz um catálogo completo de medalhas futuras.",
+  version: "Alpha 0.9.2.3",
+  date: "17 de outubro de 2026",
+  isoDate: "2026-10-17",
+  title: "O Conselho das Insígnias",
+  description: "Agora o Creator pode conceder e remover insígnias diretamente nos perfis dos usuários. Os selos continuam aparecendo ao lado do nome, com identificação ao tocar ou passar o mouse.",
   changes: [
-    "Creator e Moderator agora usam selos próprios, mais nítidos e combinando com a estética mística do CatWeb.",
-    "Sistema preparado para badges extras por perfil usando o campo badges: [] no documento do usuário.",
-    "Catálogo interno de insígnias adicionado ao site: Primeira Era, Membro Fundador, Alma Beta, Cronista, Artista, Patrono e Coração do Círculo.",
-    "As insígnias continuam mostrando o nome ao passar o mouse ou tocar, mantendo o mesmo comportamento de tooltip.",
-    "A estrutura visual foi organizada para expansões futuras sem mexer de novo no layout base."
+    "Novo menu Gerenciar insígnias, disponível exclusivamente para o Creator nos perfis de outros usuários.",
+    "Insígnias podem ser concedidas e removidas com segurança, sincronizando usuários privados e perfis públicos.",
+    "Cada selo conserva o nome exibido no toque ou ao passar o mouse.",
+    "Creator e Moderator continuam vinculados aos cargos oficiais, separados das insígnias de conquista.",
+    "Sem alteração no sistema de imagens, posts ou comunidades."
   ],
   history: [
+    {version:"Alpha 0.9.2.3",date:"17/10/2026",summary:"Gerenciamento manual e protegido das insígnias pelo Creator."},
     {version:"Alpha 0.9.2.2",date:"16/10/2026",summary:"Novo sistema de insígnias com Creator/Moderator refeitos e catálogo futuro embutido."},
     {version:"Alpha 0.9.2",date:"16/10/2026",summary:"Moderação de denúncias, menções, pesquisa, círculos e otimizações."},
     {version:"Alpha 0.9.0",date:"16/10/2026",summary:"Redesign Nocturne 2.0 e estreia dos Avisos do site."}
