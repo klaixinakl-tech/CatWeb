@@ -1848,6 +1848,7 @@ const BADGE_LIBRARY = Object.freeze({
 });
 const BADGE_CREATOR = BADGE_LIBRARY.creator.image;
 const BADGE_MOD = BADGE_LIBRARY.moderator.image;
+let currentUser = null, userProfile = null;
 
 function esc(t){
   return String(t??"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
