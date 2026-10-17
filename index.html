@@ -1249,6 +1249,39 @@ body{
 .cw-badges-tools{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
 .cw-badges-feedback{font:.78rem var(--font-ui);color:var(--muted);margin-top:10px}
 @media(max-width:600px){.cw-badges-editor{padding:13px}.cw-badges-choice{gap:9px}}
+
+/* CatWeb Alpha 0.9.2.4 — Sussurros da Noite */
+.chat-shell{border-radius:24px;overflow:hidden;box-shadow:0 22px 55px rgba(0,0,0,.16)}
+.chat-list-head{padding:19px 18px;background:linear-gradient(145deg,var(--bg-alt),var(--card))}
+.chat-list-head h2{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.01em}
+.chat-search-wrap{padding:13px 14px;border-bottom:1px solid var(--border);background:var(--card)}
+.chat-search{display:block;width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:14px;background:var(--bg);color:var(--ink);padding:12px 14px;font:inherit;font-size:.9rem;outline:none}
+.chat-search:focus{border-color:var(--accent)}
+.chat-friend-row{padding:15px 16px;gap:13px;min-height:72px}
+.chat-friend-row .cf-av{width:49px;height:49px;border:1px solid var(--border)}
+.chat-friend-row .cf-name{font-size:1rem}
+.chat-thread-head{min-height:69px;padding:13px 16px;background:var(--card)}
+.chat-thread-head h2{font-family:var(--font-display);font-size:1.25rem}
+.chat-msgs{padding:23px 17px;gap:12px;background:radial-gradient(ellipse at 80% 12%,rgba(161,101,149,.08),transparent 60%),var(--bg)}
+.chat-bubble{max-width:min(80%,540px);padding:11px 14px;border-radius:18px;line-height:1.5;box-shadow:0 7px 20px rgba(0,0,0,.08)}
+.chat-bubble.mine{border-bottom-right-radius:5px}
+.chat-bubble.theirs{border-bottom-left-radius:5px}
+.chat-day{align-self:center;padding:6px 15px;margin:12px auto 7px;border:1px solid var(--border);border-radius:50px;background:var(--card);color:var(--muted);font-size:.73rem;font-family:var(--font-ui)}
+.chat-msg-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;align-items:center}
+.chat-msg-actions button,.chat-reaction-pill{background:transparent;border:1px solid var(--border);color:inherit;border-radius:14px;padding:4px 8px;font:inherit;font-size:.72rem;cursor:pointer}
+.chat-msg-actions button:hover,.chat-reaction-pill:hover{border-color:var(--accent)}
+.chat-reaction-pill.mine-reacted{background:var(--bg-alt);border-color:var(--accent)}
+.chat-quoted{border-left:3px solid var(--accent);padding:6px 10px;margin-bottom:9px;border-radius:5px;background:rgba(150,110,145,.11);font-size:.8rem;opacity:.85;cursor:pointer}
+.chat-reply-preview{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 15px;background:var(--card);border-top:1px solid var(--border);font-size:.83rem;color:var(--muted)}
+.chat-reply-preview button{background:transparent;color:var(--ink);border:0;font-size:1.2rem;cursor:pointer}
+.chat-emoji-picker{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;padding:8px;border-radius:13px;background:var(--bg-alt);border:1px solid var(--border)}
+.chat-emoji-picker button{font-size:1.15rem;padding:5px 8px;background:transparent;border:0;cursor:pointer}
+.chat-compose{padding:13px 15px;gap:11px}
+.chat-compose textarea{border-radius:17px;padding:12px 14px;min-height:48px}
+.chat-compose .chat-send{border-radius:15px;padding:12px 18px}
+@media(max-width:719px){.chat-shell{border-radius:19px}.chat-msgs{padding:16px 11px}.chat-bubble{max-width:86%}.chat-list-head{padding:18px}.chat-compose{padding:11px}.chat-thread-pane.open ~ .mobile-compose-fab{display:none}}
+body:has(#chat-thread-pane.open) #mobile-compose-fab{display:none!important}
+
 </style>
 </head>
 <body>
@@ -1449,6 +1482,7 @@ body{
           <div class="chat-layout">
             <div class="chat-list-pane" id="chat-list-pane">
               <div class="chat-list-head"><h2>☽ Conversas</h2></div>
+              <div class="chat-search-wrap"><input class="chat-search" id="chat-search" type="search" placeholder="Buscar amigo para conversar..." autocomplete="off" aria-label="Pesquisar amigos"></div>
               <div id="chat-friends-list" style="overflow-y:auto;flex:1"></div>
             </div>
             <div class="chat-thread-pane" id="chat-thread-pane">
@@ -1460,6 +1494,7 @@ body{
               <div class="chat-msgs" id="chat-msgs">
                 <div class="chat-empty" id="chat-msgs-empty">Escolha um amigo na lista para começar.</div>
               </div>
+              <div id="chat-reply-preview" class="chat-reply-preview hidden"><span id="chat-reply-label"></span><button type="button" id="chat-reply-cancel" aria-label="Cancelar resposta">×</button></div>
               <div class="chat-char"><span id="chat-char-count">0</span>/1000</div>
               <form class="chat-compose" id="chat-form">
                 <textarea id="chat-input" maxlength="1000" rows="1" placeholder="Mensagem..." disabled></textarea>
@@ -3238,6 +3273,41 @@ function setupUserSearch(){
 let chatUnsub = null;
 let activeChatPeer = null; // {uid, displayName, photoURL, accountId}
 const CHAT_MAX = 1000;
+let chatReplyTarget=null;
+let chatSearchRows=[];
+let chatMessageCache=new Map();
+let chatReactionUnsubs=[];
+const CHAT_EMOJIS=["❤️","😂","🌙","✨","👍","😮"];
+function chatDateKey(ts){
+  if(!ts) return "";
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return Number.isNaN(d.getTime())?"":d.toLocaleDateString("pt-BR",{year:"numeric",month:"2-digit",day:"2-digit"});
+}
+function chatDayLabel(ts){
+  const d=ts?.toDate?ts.toDate():new Date(ts);
+  if(Number.isNaN(d.getTime())) return "Data desconhecida";
+  const today=new Date(); const yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
+  if(d.toDateString()===today.toDateString()) return "✦ Hoje ✦";
+  if(d.toDateString()===yesterday.toDateString()) return "✦ Ontem ✦";
+  return "✦ "+d.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"})+" ✦";
+}
+function setChatReplyTarget(id,text){
+  chatReplyTarget=id?{id,text}:null;
+  const wrap=document.getElementById("chat-reply-preview");
+  const label=document.getElementById("chat-reply-label");
+  if(wrap)wrap.classList.toggle("hidden",!chatReplyTarget);
+  if(label)label.textContent=chatReplyTarget?"↳ Respondendo: "+chatReplyTarget.text.slice(0,90):"";
+  if(chatReplyTarget)document.getElementById("chat-input")?.focus();
+}
+function filterChatRows(){
+  const q=(document.getElementById("chat-search")?.value||"").toLocaleLowerCase("pt-BR").trim();
+  document.querySelectorAll("#chat-friends-list .chat-friend-row").forEach(row=>{
+    const name=(row.dataset.search||"").toLocaleLowerCase("pt-BR");
+    row.style.display=(!q||name.includes(q))?"":"none";
+  });
+}
+function clearChatReactionListeners(){chatReactionUnsubs.forEach(f=>{try{f()}catch{}});chatReactionUnsubs=[];}
+
 
 function chatIdFor(uidA, uidB){
   return [uidA, uidB].sort().join("_");
@@ -3245,6 +3315,7 @@ function chatIdFor(uidA, uidB){
 
 function stopChatListener(){
   if(chatUnsub){ try{ chatUnsub(); }catch{} chatUnsub=null; }
+  clearChatReactionListeners();
 }
 
 async function areMutualFriends(uidA,uidB){
@@ -3341,7 +3412,7 @@ async function renderChatList(){
         ?`<div class="cf-av"><img src="${imageAttr(r.d.photoURL)}" alt=""></div>`
         :`<div class="cf-av">${esc(getInitials(name))}</div>`;
       const active=activeChatPeer&&activeChatPeer.uid===r.uid?" active":"";
-      return `<div class="chat-friend-row${active}" data-peer="${esc(r.uid)}">
+      return `<div class="chat-friend-row${active}" data-peer="${esc(r.uid)}" data-search="${esc(name+" "+(r.d.accountId||""))}">
         ${av}
         <div class="cf-meta">
           <div class="cf-name">${esc(name)}</div>
@@ -3349,6 +3420,7 @@ async function renderChatList(){
         </div>
       </div>`;
     }).join("");
+    filterChatRows();
     refreshNotificationIndicator();
     list.querySelectorAll(".chat-friend-row").forEach(row=>{
       row.addEventListener("click",()=>openChatWith(row.dataset.peer));
@@ -3382,6 +3454,7 @@ async function openChatWith(peerUid){
     document.getElementById("chat-send").disabled=false;
     document.getElementById("chat-list-pane")?.classList.add("hidden-mobile");
     document.getElementById("chat-thread-pane")?.classList.add("open");
+    setChatReplyTarget(null,null);
     listenChatMessages(peerUid);
     await markChatNotificationsRead(peerUid);
     renderChatList();
@@ -3399,32 +3472,69 @@ async function openChatWith(peerUid){
 
 function listenChatMessages(peerUid){
   stopChatListener();
-  const cid=chatIdFor(currentUser.uid, peerUid);
+  const cid=chatIdFor(currentUser.uid,peerUid);
   const box=document.getElementById("chat-msgs");
-  if(box) box.innerHTML=`<div class="chat-empty">Carregando mensagens...</div>`;
-  chatUnsub = db.collection("chats").doc(cid).collection("messages")
-    .orderBy("createdAt","asc")
-    .limitToLast(100)
-    .onSnapshot(snap=>{
-      if(!box) return;
-      if(snap.empty){
-        box.innerHTML=`<div class="chat-empty">Nenhuma mensagem ainda. Diga oi ✧</div>`;
-        return;
-      }
+  if(box)box.innerHTML=`<div class="chat-empty">Carregando mensagens...</div>`;
+  chatUnsub=db.collection("chats").doc(cid).collection("messages")
+    .orderBy("createdAt","asc").limitToLast(100).onSnapshot(snap=>{
+      if(!box)return;
+      clearChatReactionListeners();
+      chatMessageCache.clear();
+      if(snap.empty){box.innerHTML=`<div class="chat-empty">Nenhuma mensagem ainda. Diga oi ✧</div>`;return;}
       box.innerHTML="";
+      let lastDay="";
       snap.forEach(doc=>{
-        const m=doc.data();
-        const mine=m.senderId===currentUser.uid;
-        const row=document.createElement("div");
-        row.className="chat-bubble-row "+(mine?"mine":"theirs");
-        row.innerHTML=`<div class="chat-bubble ${mine?"mine":"theirs"}">${esc(m.text||"")}<span class="chat-time">${esc(formatChatTime(m.createdAt))}</span></div>`;
-        box.appendChild(row);
+        const m=doc.data(),id=doc.id,mine=m.senderId===currentUser.uid;
+        chatMessageCache.set(id,m);
+        const day=chatDateKey(m.createdAt);
+        if(day!==lastDay){
+          const sep=document.createElement("div");sep.className="chat-day";sep.textContent=chatDayLabel(m.createdAt);box.appendChild(sep);lastDay=day;
+        }
+        const row=document.createElement("div");row.className="chat-bubble-row "+(mine?"mine":"theirs");row.id="chat-message-"+id;
+        const bubble=document.createElement("div");bubble.className="chat-bubble "+(mine?"mine":"theirs");
+        if(m.replyTo){
+          const quote=document.createElement("div");quote.className="chat-quoted";
+          quote.textContent="↳ "+(m.replyText||"Mensagem anterior");
+          quote.addEventListener("click",()=>document.getElementById("chat-message-"+m.replyTo)?.scrollIntoView({behavior:"smooth",block:"center"}));
+          bubble.appendChild(quote);
+        }
+        const body=document.createElement("div");body.textContent=m.text||"";bubble.appendChild(body);
+        const time=document.createElement("span");time.className="chat-time";time.textContent=formatChatTime(m.createdAt);bubble.appendChild(time);
+        const reactions=document.createElement("div");reactions.className="chat-msg-actions";bubble.appendChild(reactions);
+        const actions=document.createElement("div");actions.className="chat-msg-actions";
+        const reply=document.createElement("button");reply.type="button";reply.textContent="↳ Responder";reply.addEventListener("click",()=>setChatReplyTarget(id,m.text||""));actions.appendChild(reply);
+        const react=document.createElement("button");react.type="button";react.textContent="♡ Reagir";actions.appendChild(react);
+        const menu=document.createElement("button");menu.type="button";menu.textContent="⋯ Opções";actions.appendChild(menu);
+        const picker=document.createElement("div");picker.className="chat-emoji-picker hidden";
+        CHAT_EMOJIS.forEach(emoji=>{const b=document.createElement("button");b.type="button";b.textContent=emoji;b.addEventListener("click",()=>toggleChatReaction(cid,id,emoji));picker.appendChild(b)});
+        react.addEventListener("click",()=>picker.classList.toggle("hidden"));
+        const options=document.createElement("div");options.className="chat-emoji-picker hidden";
+        const copy=document.createElement("button");copy.type="button";copy.textContent="⧉ Copiar";
+        copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(m.text||"");showToast("Mensagem copiada");options.classList.add("hidden")}catch{showToast("Não foi possível copiar")}});
+        const replyMenu=document.createElement("button");replyMenu.type="button";replyMenu.textContent="↳ Responder";
+        replyMenu.addEventListener("click",()=>{setChatReplyTarget(id,m.text||"");options.classList.add("hidden")});
+        const report=document.createElement("button");report.type="button";report.textContent="⚑ Denunciar";
+        report.addEventListener("click",()=>showToast("Denúncia de mensagem privada ainda não disponível. Procure a moderação."));
+        options.append(copy,replyMenu,report);
+        menu.addEventListener("click",()=>options.classList.toggle("hidden"));
+        bubble.appendChild(actions);bubble.appendChild(picker);bubble.appendChild(options);row.appendChild(bubble);box.appendChild(row);
+        const unsub=db.collection("chats").doc(cid).collection("messages").doc(id).collection("reactions")
+          .onSnapshot(rs=>{
+            const counts=new Map(),own=new Set();
+            rs.forEach(r=>{const d=r.data(),emoji=d.emoji;if(!CHAT_EMOJIS.includes(emoji))return;counts.set(emoji,(counts.get(emoji)||0)+1);if(r.id===currentUser.uid)own.add(emoji)});
+            reactions.replaceChildren();
+            counts.forEach((n,emoji)=>{const b=document.createElement("button");b.type="button";b.className="chat-reaction-pill"+(own.has(emoji)?" mine-reacted":"");b.textContent=emoji+" "+n;b.addEventListener("click",()=>toggleChatReaction(cid,id,emoji));reactions.appendChild(b)});
+          },e=>console.warn("Reações indisponíveis",e));
+        chatReactionUnsubs.push(unsub);
       });
       box.scrollTop=box.scrollHeight;
-    }, err=>{
-      console.error(err);
-      if(box) box.innerHTML=`<div class="chat-empty">Erro ao carregar mensagens (regras/índice do Firestore).</div>`;
-    });
+    },err=>{console.error(err);if(box)box.innerHTML=`<div class="chat-empty">Erro ao carregar mensagens (regras/índice do Firestore).</div>`});
+}
+async function toggleChatReaction(cid,id,emoji){
+  if(!currentUser||!CHAT_EMOJIS.includes(emoji))return;
+  const ref=db.collection("chats").doc(cid).collection("messages").doc(id).collection("reactions").doc(currentUser.uid);
+  try{const snap=await ref.get();if(snap.exists&&snap.data().emoji===emoji)await ref.delete();else await ref.set({emoji,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
+  catch(e){console.error(e);showToast("Não foi possível reagir. Confira as regras novas do Firebase.")}
 }
 
 async function sendChatMessage(e){
@@ -3459,11 +3569,10 @@ async function sendChatMessage(e){
     }
 
     const cid=await ensureChatDoc(activeChatPeer.uid);
-    const messageRef=await db.collection("chats").doc(cid).collection("messages").add({
-      text,
-      senderId: currentUser.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    const payload={text,senderId:currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(chatReplyTarget){payload.replyTo=chatReplyTarget.id;payload.replyText=chatReplyTarget.text.slice(0,160);}
+    const messageRef=await db.collection("chats").doc(cid).collection("messages").add(payload);
+    setChatReplyTarget(null,null);
     await db.collection("chats").doc(cid).set({
       lastMessage: text.slice(0,120),
       lastSender: currentUser.uid,
@@ -3493,6 +3602,7 @@ function updateChatCharCount(){
 function closeChatThread(){
   stopChatListener();
   activeChatPeer=null;
+  setChatReplyTarget(null,null);
   document.getElementById("chat-list-pane")?.classList.remove("hidden-mobile");
   document.getElementById("chat-thread-pane")?.classList.remove("open");
   document.getElementById("chat-peer-name").textContent="Selecione um amigo";
@@ -3506,6 +3616,8 @@ function setupChatUI(){
   document.getElementById("btn-chat-login")?.addEventListener("click", openAuth);
   document.getElementById("chat-form")?.addEventListener("submit", sendChatMessage);
   document.getElementById("chat-back")?.addEventListener("click", closeChatThread);
+  document.getElementById("chat-search")?.addEventListener("input",filterChatRows);
+  document.getElementById("chat-reply-cancel")?.addEventListener("click",()=>setChatReplyTarget(null,null));
   const input=document.getElementById("chat-input");
   input?.addEventListener("input", updateChatCharCount);
   input?.addEventListener("keydown", e=>{
@@ -4347,10 +4459,10 @@ function openBadgeEditor(uid,publicData){
 
 // ALTERE ESTE OBJETO A CADA NOVA VERSÃO. A página Avisos e o selo do logo usam a mesma fonte.
 const CATWEB_RELEASE = Object.freeze({
-  version: "Alpha 0.9.2.3",
+  version: "Alpha 0.9.2.4",
   date: "17 de outubro de 2026",
   isoDate: "2026-10-17",
-  title: "O Conselho das Insígnias",
+  title: "Sussurros da Noite",
   description: "Agora o Creator pode conceder e remover insígnias diretamente nos perfis dos usuários. Os selos continuam aparecendo ao lado do nome, com identificação ao tocar ou passar o mouse.",
   changes: [
     "Novo menu Gerenciar insígnias, disponível exclusivamente para o Creator nos perfis de outros usuários.",
