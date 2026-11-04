@@ -1494,6 +1494,38 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
   .cw-profile-edit-modal .cw-appearance-fields{grid-template-columns:1fr}
 }
 
+
+/* ===== Alpha 0.9.4.1 — Estúdio dos Fragmentos ===== */
+.cw-cover-choose{margin:4px 0 10px}
+.cw-cover-editor-row{display:flex;gap:12px;align-items:center;margin-top:7px;min-width:0}
+.cw-cover-preview{width:84px;height:84px;object-fit:cover;border:1px solid var(--border);border-radius:13px;flex-shrink:0}
+.cw-cover-tools{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.cw-cover-tools input[type=file]{width:100%;max-width:100%;font-size:.78rem}
+.cw-cover-tools button{align-self:flex-start}
+.cw-cover-tools small{font:.74rem/1.45 var(--font-ui);color:var(--muted)}
+.cw-music-meta-row{display:flex;gap:12px;align-items:center;margin-bottom:9px;min-width:0}
+.cw-music-art{height:66px;width:66px;flex-shrink:0;object-fit:cover;border-radius:12px;border:1px solid rgba(200,165,187,.26)}
+.cw-music-art-placeholder{display:grid;place-items:center;background:linear-gradient(135deg,#482a4b,#231527);color:#eecbdf;font:1.5rem var(--font-display)}
+.cw-music-meta-row .cw-music-meta{min-width:0;overflow-wrap:anywhere;margin:0}
+.cw-audio-trim{margin:12px 0;padding:12px;border:1px solid var(--border);background:rgba(75,39,78,.12);border-radius:13px;min-width:0}
+.cw-audio-trim canvas{display:block;width:100%;height:auto;aspect-ratio:660/108;border-radius:9px;background:#190f23;touch-action:none;cursor:crosshair}
+.cw-audio-trim label{display:block;margin:9px 0 2px;font:.77rem var(--font-ui);color:var(--muted)}
+.cw-audio-trim input[type=range]{width:100%;min-width:0;accent-color:#b379ab}
+.cw-trim-timings{display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;margin:9px 0;font:.72rem var(--font-ui);color:var(--muted)}
+.cw-trim-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#cw-image-crop-modal{position:fixed;inset:0;z-index:99999;background:rgba(7,4,12,.83);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:18px}
+#cw-image-crop-modal.hidden{display:none!important}
+.cw-crop-panel{width:min(610px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;padding:20px;border-radius:21px;border:1px solid #71516c;background:#1c1323;color:#f6e7f0;box-shadow:0 23px 80px #000a;display:flex;flex-direction:column;gap:12px}
+.cw-crop-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cw-crop-head h2{font:600 1.55rem var(--font-display);margin:0;color:#f6e7f0}
+#cw-crop-close{font-size:1.15rem;background:transparent;border:1px solid #725471;border-radius:50%;width:36px;height:36px;cursor:pointer;color:inherit}
+.cw-crop-panel p{font:.82rem/1.45 var(--font-ui);color:#cbb4c3;margin:0}
+#cw-crop-canvas{display:block;max-width:100%;max-height:55vh;object-fit:contain;width:100%;height:auto;touch-action:none;cursor:grab;border:1px solid #684967;border-radius:12px;background:#0f0a15;align-self:center}
+#cw-crop-canvas:active{cursor:grabbing}
+.cw-crop-panel label{font:.83rem var(--font-ui);display:flex;justify-content:space-between}
+#cw-crop-zoom{accent-color:#b981a5;width:100%}
+.cw-crop-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+@media(max-width:520px){.cw-crop-panel{padding:13px;border-radius:16px}.cw-crop-head h2{font-size:1.25rem}.cw-trim-timings{font-size:.66rem}.cw-cover-preview{height:70px;width:70px}}
 </style>
 </head>
 <body>
@@ -1956,6 +1988,17 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
     </div>
   </div>
 
+  <div id="cw-image-crop-modal" class="hidden" role="dialog" aria-modal="true" aria-label="Editar enquadramento da imagem">
+    <div class="cw-crop-panel">
+      <div class="cw-crop-head"><h2 id="cw-crop-title">Ajustar imagem</h2><button type="button" id="cw-crop-close" aria-label="Cancelar recorte">✕</button></div>
+      <p>Arraste para posicionar a imagem e use o controle para ampliar.</p>
+      <canvas id="cw-crop-canvas" width="400" height="400" aria-label="Prévia da imagem cortada"></canvas>
+      <label for="cw-crop-zoom">Zoom da imagem <span id="cw-crop-zoom-label">100%</span></label>
+      <input id="cw-crop-zoom" type="range" min="1" max="3" step="0.01" value="1">
+      <div class="cw-crop-actions"><button id="cw-crop-cancel" class="btn btn-secondary" type="button">Cancelar</button><button id="cw-crop-apply" class="btn btn-primary" type="button">Aplicar recorte</button></div>
+    </div>
+  </div>
+
   <div id="edit-profile-modal" class="modal hidden cw-profile-edit-modal">
     <div class="modal-content wide">
       <button class="modal-close" id="edit-profile-close">&times;</button>
@@ -2061,6 +2104,17 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
             <label>Artista / crédito
               <input id="cw-music-artist" maxlength="80" placeholder="Artista ou autor">
             </label>
+            <div class="cw-field-wide cw-cover-choose">
+              <label for="cw-music-cover-file">Capa da música (JPG, PNG ou WebP)</label>
+              <div class="cw-cover-editor-row">
+                <img id="cw-music-cover-preview" class="cw-cover-preview hidden" alt="Prévia da capa">
+                <div class="cw-cover-tools">
+                  <input id="cw-music-cover-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+                  <button type="button" class="btn btn-secondary btn-sm" id="cw-music-cover-remove">Remover capa</button>
+                  <small>A imagem será compactada no próprio aparelho; não usa Firebase Storage.</small>
+                </div>
+              </div>
+            </div>
             <label class="cw-field-wide">Origem do áudio
               <select id="cw-music-mode"><option value="none">Sem música</option><option value="file">Enviar arquivo pequeno</option><option value="url">Link direto HTTPS de áudio</option></select>
             </label>
@@ -2070,7 +2124,20 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
             <div class="cw-field-wide hidden" id="cw-music-file-row">
               <label for="cw-music-file">Escolher áudio do aparelho (MP3, M4A, OGG, WebM, WAV)</label>
               <input id="cw-music-file" type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/ogg,audio/webm,audio/wav,audio/x-wav,.mp3,.m4a,.ogg,.webm,.wav">
-              <p class="form-hint">Máximo: 500 KB. Ideal para trechos curtos. O arquivo é guardado no Firestore e só é baixado ao clicar para ouvir. Músicas completas geralmente são grandes demais.</p>
+              <p class="form-hint">Selecione uma música (até 15 MB) e corte um trecho de até 15 segundos no editor. O trecho final é compactado para até 500 KB antes de salvar no Firestore.</p>
+              <div id="cw-audio-trim-editor" class="cw-audio-trim hidden" aria-label="Editor de trecho musical">
+                <canvas id="cw-audio-wave" width="660" height="108" aria-label="Forma de onda e seleção do áudio"></canvas>
+                <div class="cw-trim-timings"><span id="cw-trim-start-label">Início 0:00</span><span id="cw-trim-duration-label">Trecho 0:00</span><span id="cw-trim-end-label">Fim 0:00</span></div>
+                <label for="cw-trim-start">Mover início do trecho</label>
+                <input type="range" id="cw-trim-start" min="0" max="100" step="0.05" value="0">
+                <label for="cw-trim-end">Mover fim do trecho</label>
+                <input type="range" id="cw-trim-end" min="0" max="100" step="0.05" value="0">
+                <div class="cw-trim-buttons">
+                  <button type="button" class="btn btn-secondary btn-sm" id="cw-trim-listen">▶ Ouvir seleção</button>
+                  <button type="button" class="btn btn-primary btn-sm" id="cw-trim-create">✂ Preparar trecho</button>
+                </div>
+                <p class="form-hint">Arraste as marcações na onda ou os controles de início e fim. Para salvar a música, toque em <strong>Preparar trecho</strong> primeiro.</p>
+              </div>
               <p class="form-hint" id="cw-music-file-state" aria-live="polite"></p>
               <audio id="cw-music-file-preview" class="cw-music-preview hidden" controls preload="none"></audio>
             </div>
@@ -2675,12 +2742,19 @@ const CW_APPEARANCE_THEMES=Object.freeze({
  const CW_BLOCK_LABELS=Object.freeze({bio:'Sobre mim',interests:'Interesses',quote:'Frase favorita',status:'Status pessoal',music:'Música',favorites:'Top 5 favoritos',links:'Minhas redes',badges:'Insígnias',posts:'Publicações'});
  const CW_AUDIO_MAX_BYTES=500*1024;
  const CW_AUDIO_TYPES=Object.freeze(['audio/mpeg','audio/mp3','audio/mp4','audio/x-m4a','audio/ogg','audio/webm','audio/wav','audio/x-wav']);
- const CW_APPEARANCE_DEFAULT=Object.freeze({theme:"nocturne",backgroundMode:"gradient",backgroundUrl:"",accent:"#ae789c",card:"solid",font:"classic",frame:"classic",overlay:35,position:"center",interests:"",cardOpacity:90,borderStyle:"plain",blockOrder:[...CW_BLOCK_IDS],hiddenBlocks:[],quote:"",status:"",favorites:"",musicMode:"none",musicTitle:"",musicArtist:"",musicUrl:""});
+ const CW_APPEARANCE_DEFAULT=Object.freeze({theme:"nocturne",backgroundMode:"gradient",backgroundUrl:"",accent:"#ae789c",card:"solid",font:"classic",frame:"classic",overlay:35,position:"center",interests:"",cardOpacity:90,borderStyle:"plain",blockOrder:[...CW_BLOCK_IDS],hiddenBlocks:[],quote:"",status:"",favorites:"",musicMode:"none",musicTitle:"",musicArtist:"",musicUrl:"",musicCover:""});
 const CW_FONTS=Object.freeze({classic:'var(--font-body)',elegant:'"Cormorant Garamond",Georgia,serif',modern:'var(--font-ui)'});
 function cwSafeWallpaper(url){
   const raw=String(url||"").trim();if(!raw)return "";
   if(raw.length>400 || /["'\\<>\s]/.test(raw))return "";
   try{const u=new URL(raw);return u.protocol==='https:'&&!u.username&&!u.password&&u.href.length<=400?u.href:"";}catch{return "";}
+}
+function cwSafeMusicCover(value){
+  const v=String(value||'').trim();
+  if(v.length>48000)return '';
+  if(/^data:image\/(?:jpeg|png|webp);base64,[a-z0-9+/]+={0,2}$/i.test(v))return v;
+  try{const u=new URL(v);if(u.protocol==='https:'&&u.href.length<=400)return u.href;}catch(_){}
+  return '';
 }
 function cwNormalizeAppearance(value){
   const a=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
@@ -2708,7 +2782,8 @@ function cwNormalizeAppearance(value){
      musicMode:from('musicMode',['none','url','file'],'none'),
      musicTitle:typeof a.musicTitle==='string'?a.musicTitle.slice(0,80):'',
      musicArtist:typeof a.musicArtist==='string'?a.musicArtist.slice(0,80):'',
-     musicUrl:cwSafeWallpaper(a.musicUrl)
+     musicUrl:cwSafeWallpaper(a.musicUrl),
+     musicCover: cwSafeMusicCover(a.musicCover)
    };
 }
 function cwProfileInterests(container,appearance){
@@ -2778,7 +2853,8 @@ function cwReadAppearanceForm(strict=true){
     musicMode:document.getElementById('cw-music-mode')?.value,
     musicTitle:document.getElementById('cw-music-title')?.value.trim()||'',
     musicArtist:document.getElementById('cw-music-artist')?.value.trim()||'',
-    musicUrl:cwSafeWallpaper(document.getElementById('cw-music-url')?.value.trim()||'')
+    musicUrl:cwSafeWallpaper(document.getElementById('cw-music-url')?.value.trim()||''),
+    musicCover:cwPendingMusicCover
   });
 }
 function cwSetAppearanceForm(value){
@@ -2795,6 +2871,8 @@ function cwSetAppearanceForm(value){
     const el=document.getElementById(id);if(el)el.value=val;
   }
   cwBlockOrder=[...a.blockOrder];cwHiddenBlocks=new Set(a.hiddenBlocks);cwRenderBlockEditor();
+  cwPendingMusicCover=a.musicCover;
+  cwRenderCoverPreview();
   cwAudioUpdateInputRows();
   const name=document.getElementById('cw-preview-name');if(name)name.textContent=document.getElementById('ep-name')?.value||'Seu perfil';
   cwDrawAppearancePreview();
@@ -2825,6 +2903,34 @@ let cwBlockOrder=[...CW_BLOCK_IDS];
 let cwHiddenBlocks=new Set();
 let cwPendingAudioFile=null;
 let cwAudioPreviewUrl=null;
+let cwPendingMusicCover='';
+let cwDecodedAudio=null;
+let cwAudioSelection=null;
+let cwTrimAudioContext=null;
+let cwTrimPlaying=null;
+const CW_TRIM_MAX_SECONDS=15;
+const CW_AUDIO_SOURCE_MAX=15*1024*1024;
+function cwRenderCoverPreview(){
+  const img=document.getElementById('cw-music-cover-preview');if(!img)return;
+  const src=cwSafeMusicCover(cwPendingMusicCover);
+  img.classList.toggle('hidden',!src);if(src)img.src=src;else img.removeAttribute('src');
+}
+async function cwCompressCover(file){
+  if(!file||!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>12*1024*1024)
+    throw new Error('Escolha uma imagem JPG, PNG ou WebP de até 12 MB para a capa.');
+  const im=await loadLocalImage(file);
+  if(!im.naturalWidth||!im.naturalHeight)throw new Error('Imagem da capa inválida.');
+  const canvas=document.createElement('canvas');canvas.width=220;canvas.height=220;
+  const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas indisponível.');
+  const side=Math.min(im.naturalWidth,im.naturalHeight),sx=(im.naturalWidth-side)/2,sy=(im.naturalHeight-side)/2;
+  ctx.drawImage(im,sx,sy,side,side,0,0,220,220);
+  for(const quality of [.8,.65,.5,.4]){
+    const data=canvasToCompactDataURL(canvas,quality);
+    if(data.length<=48000)return data;
+  }
+  throw new Error('Não foi possível compactar a capa; tente outra imagem.');
+}
+
 const cwAudioPlayers=new Map();
 function cwRenderBlockEditor(){
   const list=document.getElementById('cw-layout-list');if(!list)return;
@@ -2855,6 +2961,9 @@ function cwAudioMime(file){
   return {mp3:'audio/mpeg',m4a:'audio/mp4',ogg:'audio/ogg',webm:'audio/webm',wav:'audio/wav'}[ext]||'';
 }
 function cwClearAudioDraft(){
+  cwStopAudioSelection();
+  cwDecodedAudio=null;cwAudioSelection=null;
+  document.getElementById('cw-audio-trim-editor')?.classList.add('hidden');
   cwPendingAudioFile=null;
   if(cwAudioPreviewUrl) URL.revokeObjectURL(cwAudioPreviewUrl);
   cwAudioPreviewUrl=null;
@@ -2873,25 +2982,161 @@ function cwAudioUpdateInputRows(){
       : 'Nenhum arquivo selecionado.';
   }
 }
+function cwStopAudioSelection(){
+  if(cwTrimPlaying){try{cwTrimPlaying.stop()}catch(_){}cwTrimPlaying=null;}
+}
+function cwTrimLabel(seconds){
+  const n=Math.max(0,Math.floor(Number(seconds)||0));
+  return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
+}
+function cwShowWaveform(){
+  const canvas=document.getElementById('cw-audio-wave');
+  if(!canvas||!cwDecodedAudio||!cwAudioSelection)return;
+  const {width:w,height:h}=canvas,ctx=canvas.getContext('2d');if(!ctx)return;
+  const a=cwAudioSelection,buffer=cwDecodedAudio;
+  ctx.fillStyle='#1c1027';ctx.fillRect(0,0,w,h);
+  const channel=buffer.getChannelData(0),bins=165;
+  const sectionStart=Math.floor(a.start/buffer.duration*w),sectionEnd=Math.ceil(a.end/buffer.duration*w);
+  ctx.fillStyle='rgba(192,116,192,.32)';ctx.fillRect(sectionStart,0,sectionEnd-sectionStart,h);
+  for(let k=0;k<bins;k++){
+    const sampleStart=Math.floor(k/bins*channel.length),sampleEnd=Math.min(channel.length,Math.floor((k+1)/bins*channel.length));
+    const stride=Math.max(1,Math.floor((sampleEnd-sampleStart)/70));let peak=0;
+    for(let i=sampleStart;i<sampleEnd;i+=stride)peak=Math.max(peak,Math.abs(channel[i]));
+    const bh=Math.max(2,peak*(h-12));ctx.fillStyle=(k/bins*buffer.duration>=a.start&&k/bins*buffer.duration<=a.end)?'#e3a9d2':'#79617b';
+    ctx.fillRect(k*w/bins,h/2-bh/2,Math.max(2,w/bins-1),bh);
+  }
+  ctx.strokeStyle='#ffe7a6';ctx.lineWidth=3;
+  [sectionStart,sectionEnd].forEach(x=>{ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();});
+  document.getElementById('cw-trim-start-label').textContent='Início '+cwTrimLabel(a.start);
+  document.getElementById('cw-trim-end-label').textContent='Fim '+cwTrimLabel(a.end);
+  document.getElementById('cw-trim-duration-label').textContent='Trecho '+(a.end-a.start).toFixed(1).replace('.',',')+' s';
+  const start=document.getElementById('cw-trim-start'),end=document.getElementById('cw-trim-end');
+  start.max=end.max=String(buffer.duration);start.value=String(a.start);end.value=String(a.end);
+}
+function cwInvalidateTrim(){
+  cwStopAudioSelection();
+  if(cwPendingAudioFile){
+    cwPendingAudioFile=null;
+    if(cwAudioPreviewUrl)URL.revokeObjectURL(cwAudioPreviewUrl);
+    cwAudioPreviewUrl=null;
+    const preview=document.getElementById('cw-music-file-preview');if(preview){preview.pause();preview.removeAttribute('src');preview.load();preview.classList.add('hidden');}
+  }
+  const state=document.getElementById('cw-music-file-state');if(state)state.textContent='Seleção alterada. Toque em Preparar trecho para salvar.';
+}
+function cwChangeTrim(kind,v){
+  if(!cwAudioSelection)return;
+  const a=cwAudioSelection,raw=Math.max(0,Math.min(a.duration,Number(v)||0));
+  if(kind==='start'){
+    a.start=Math.min(raw,a.duration-.25);
+    if(a.end<a.start+.25)a.end=Math.min(a.duration,a.start+.25);
+    if(a.end-a.start>CW_TRIM_MAX_SECONDS)a.end=a.start+CW_TRIM_MAX_SECONDS;
+  }else{
+    a.end=Math.max(.25,raw);
+    if(a.start>a.end-.25)a.start=Math.max(0,a.end-.25);
+    if(a.end-a.start>CW_TRIM_MAX_SECONDS)a.start=a.end-CW_TRIM_MAX_SECONDS;
+  }
+  cwInvalidateTrim();cwShowWaveform();
+}
+async function cwListenTrim(){
+  if(!cwDecodedAudio||!cwAudioSelection)return;
+  cwStopAudioSelection();
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(!Ctx)throw new Error('Prévia de áudio não suportada neste navegador.');
+  if(!cwTrimAudioContext)cwTrimAudioContext=new Ctx();
+  await cwTrimAudioContext.resume();
+  const src=cwTrimAudioContext.createBufferSource();
+  src.buffer=cwDecodedAudio;src.connect(cwTrimAudioContext.destination);
+  src.onended=()=>{if(cwTrimPlaying===src)cwTrimPlaying=null;};
+  cwTrimPlaying=src;src.start(0,cwAudioSelection.start,cwAudioSelection.end-cwAudioSelection.start);
+}
+function cwEncodeWav(buffer){
+  const data=buffer.getChannelData(0),ab=new ArrayBuffer(44+data.length*2),view=new DataView(ab);
+  const str=(offset,text)=>{for(let i=0;i<text.length;i++)view.setUint8(offset+i,text.charCodeAt(i));};
+  str(0,'RIFF');view.setUint32(4,36+data.length*2,true);str(8,'WAVE');str(12,'fmt ');
+  view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);
+  view.setUint32(24,buffer.sampleRate,true);view.setUint32(28,buffer.sampleRate*2,true);
+  view.setUint16(32,2,true);view.setUint16(34,16,true);str(36,'data');view.setUint32(40,data.length*2,true);
+  for(let i=0;i<data.length;i++){const s=Math.max(-1,Math.min(1,data[i]));view.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true);}
+  return new Blob([ab],{type:'audio/wav'});
+}
+async function cwPrepareTrim(){
+  if(!cwDecodedAudio||!cwAudioSelection)throw new Error('Escolha um áudio primeiro.');
+  cwStopAudioSelection();
+  const {start,end}=cwAudioSelection,duration=end-start;
+  if(duration<.25||duration>CW_TRIM_MAX_SECONDS+.01)throw new Error('Selecione um trecho de até 15 segundos.');
+  const sampleRate=16000,frames=Math.round(duration*sampleRate);
+  const offline=new OfflineAudioContext(1,frames,sampleRate);
+  const source=offline.createBufferSource();source.buffer=cwDecodedAudio;source.connect(offline.destination);
+  source.start(0,start,duration);
+  const rendered=await offline.startRendering();const blob=cwEncodeWav(rendered);
+  if(blob.size>CW_AUDIO_MAX_BYTES)throw new Error('O trecho excedeu 500 KB. Diminua alguns segundos.');
+  if(cwAudioPreviewUrl)URL.revokeObjectURL(cwAudioPreviewUrl);
+  cwPendingAudioFile=new File([blob],'trecho-catweb.wav',{type:'audio/wav'});
+  cwAudioPreviewUrl=URL.createObjectURL(blob);
+  const preview=document.getElementById('cw-music-file-preview');
+  if(preview){preview.src=cwAudioPreviewUrl;preview.classList.remove('hidden');preview.load();}
+  const state=document.getElementById('cw-music-file-state');
+  if(state)state.textContent='Trecho preparado: '+duration.toFixed(1).replace('.',',')+'s · '+Math.ceil(blob.size/1024)+' KB. Agora toque em Salvar o perfil.';
+}
 function cwInitAudioEditor(){
   const mode=document.getElementById('cw-music-mode');if(!mode||mode.dataset.ready)return;
   mode.dataset.ready='1';mode.addEventListener('change',cwAudioUpdateInputRows);
+  const cover=document.getElementById('cw-music-cover-file');
+  cover?.addEventListener('change',async()=>{
+    if(!cover.files?.[0])return;
+    const state=document.getElementById('cw-music-file-state');
+    try{cwPendingMusicCover=await cwCompressCover(cover.files[0]);cwRenderCoverPreview();if(state)state.textContent='Capa preparada. Salve o perfil para publicar.';}
+    catch(err){showToast(err.message||'Falha ao preparar a capa.');}
+    finally{cover.value='';}
+  });
+  document.getElementById('cw-music-cover-remove')?.addEventListener('click',()=>{cwPendingMusicCover='';cwRenderCoverPreview();});
   const input=document.getElementById('cw-music-file');
-  if(input){
-    input.addEventListener('change',()=>{
-      const file=input.files?.[0];
-      const state=document.getElementById('cw-music-file-state');
-      if(!file){cwClearAudioDraft();cwAudioUpdateInputRows();return;}
-      const mime=cwAudioMime(file);
-      if(!CW_AUDIO_TYPES.includes(mime)){cwClearAudioDraft();if(state)state.textContent='Formato não aceito. Escolha MP3, M4A, OGG, WebM ou WAV.';return;}
-      if(file.size<=0||file.size>CW_AUDIO_MAX_BYTES){cwClearAudioDraft();if(state)state.textContent='Arquivo grande demais. O limite é 500 KB por trecho.';return;}
-      cwClearAudioDraft();cwPendingAudioFile=file;
-      cwAudioPreviewUrl=URL.createObjectURL(file);
-      const preview=document.getElementById('cw-music-file-preview');
-      if(preview){preview.src=cwAudioPreviewUrl;preview.classList.remove('hidden');}
-      if(state)state.textContent=`Pronto para salvar: ${file.name} (${Math.round(file.size/1024)} KB).`;
-    });
-  }
+  input?.addEventListener('change',async()=>{
+    const file=input.files?.[0],state=document.getElementById('cw-music-file-state');
+    if(!file)return;
+    const mime=cwAudioMime(file);
+    if(!CW_AUDIO_TYPES.includes(mime)||file.size>CW_AUDIO_SOURCE_MAX||file.size<=0){
+      cwClearAudioDraft();if(state)state.textContent='Escolha MP3, M4A, OGG, WebM ou WAV com até 15 MB.';return;
+    }
+    cwClearAudioDraft();if(state)state.textContent='Analisando música…';
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext;
+      if(!Ctx)throw new Error('Seu navegador não suporta o editor de áudio.');
+      const ctx=new Ctx(),buffer=await ctx.decodeAudioData(await file.arrayBuffer());
+      await ctx.close();
+      if(!buffer.duration||!Number.isFinite(buffer.duration))throw new Error('Duração inválida.');
+      cwDecodedAudio=buffer;
+      cwAudioSelection={start:0,end:Math.min(CW_TRIM_MAX_SECONDS,buffer.duration),duration:buffer.duration};
+      document.getElementById('cw-audio-trim-editor')?.classList.remove('hidden');
+      cwShowWaveform();
+      if(state)state.textContent='Áudio carregado ('+cwTrimLabel(buffer.duration)+'). Selecione e prepare um trecho.';
+    }catch(err){
+      cwClearAudioDraft();if(state)state.textContent=err.message||'Não foi possível abrir esse áudio.';
+    }
+  });
+  document.getElementById('cw-trim-start')?.addEventListener('input',e=>cwChangeTrim('start',e.target.value));
+  document.getElementById('cw-trim-end')?.addEventListener('input',e=>cwChangeTrim('end',e.target.value));
+  document.getElementById('cw-trim-listen')?.addEventListener('click',()=>cwListenTrim().catch(e=>showToast(e.message)));
+  const trimBtn=document.getElementById('cw-trim-create');
+  trimBtn?.addEventListener('click',async()=>{
+    trimBtn.disabled=true;const old=trimBtn.textContent;trimBtn.textContent='Preparando…';
+    try{await cwPrepareTrim();}catch(e){showToast(e.message||'Não foi possível cortar esse trecho.');}
+    finally{trimBtn.disabled=false;trimBtn.textContent=old;}
+  });
+  const wave=document.getElementById('cw-audio-wave');
+  let dragging=null;
+  wave?.addEventListener('pointerdown',e=>{
+    if(!cwAudioSelection)return;
+    e.preventDefault();const rect=wave.getBoundingClientRect(),t=Math.max(0,Math.min(cwAudioSelection.duration,(e.clientX-rect.left)/rect.width*cwAudioSelection.duration));
+    dragging=Math.abs(t-cwAudioSelection.start)<Math.abs(t-cwAudioSelection.end)?'start':'end';
+    wave.setPointerCapture(e.pointerId);cwChangeTrim(dragging,t);
+  });
+  wave?.addEventListener('pointermove',e=>{
+    if(!dragging||!cwAudioSelection)return;
+    const rect=wave.getBoundingClientRect();cwChangeTrim(dragging,(e.clientX-rect.left)/rect.width*cwAudioSelection.duration);
+  });
+  wave?.addEventListener('pointerup',()=>dragging=null);
+  wave?.addEventListener('pointercancel',()=>dragging=null);
 }
 function cwBlockContent(root,ownerUid,ap,profile){
   if(!root)return;
@@ -2914,10 +3159,16 @@ function cwBlockContent(root,ownerUid,ap,profile){
   if(music){music.replaceChildren();
     if(a.musicMode!=='none'&&(a.musicMode==='file'||a.musicUrl)){
       const title=document.createElement('div');title.className='cw-block-title';title.textContent='♫ Música do perfil';music.appendChild(title);
+      const top=document.createElement('div');top.className='cw-music-meta-row';
+      const cover=document.createElement(a.musicCover?'img':'div');
+      cover.className='cw-music-art'+(a.musicCover?'':' cw-music-art-placeholder');
+      if(a.musicCover){cover.src=cwSafeMusicCover(a.musicCover);cover.alt='Capa da música';cover.loading='lazy';}
+      else cover.textContent='♫';
+      top.appendChild(cover);
       const meta=document.createElement('div');meta.className='cw-music-meta';
       const strong=document.createElement('strong');strong.textContent=a.musicTitle||'Trecho musical';meta.appendChild(strong);
       if(a.musicArtist){const small=document.createElement('small');small.textContent=a.musicArtist;meta.appendChild(small);}
-      music.appendChild(meta);
+      top.appendChild(meta);music.appendChild(top);
       if(a.musicMode==='url'){
         const player=document.createElement('audio');player.className='cw-music-player';player.controls=true;player.preload='none';player.src=a.musicUrl;music.appendChild(player);
       }else{
@@ -3265,6 +3516,87 @@ async function readMediaFile(file, mediaKind){
   throw new Error("Não foi possível compactar essa imagem o suficiente. Tente uma imagem menor.");
 }
 
+let cwActiveCrop=null;
+function cwCropPaint(){
+  const c=cwActiveCrop;if(!c)return;
+  const canvas=document.getElementById('cw-crop-canvas'),ctx=canvas?.getContext('2d');if(!ctx)return;
+  const w=canvas.width,h=canvas.height,im=c.image;
+  const base=Math.max(w/im.naturalWidth,h/im.naturalHeight),scale=base*c.zoom;
+  const iw=im.naturalWidth*scale,ih=im.naturalHeight*scale;
+  const extraX=Math.max(0,(iw-w)/2),extraY=Math.max(0,(ih-h)/2);
+  c.extraX=extraX;c.extraY=extraY;
+  ctx.fillStyle='#140d1b';ctx.fillRect(0,0,w,h);
+  ctx.drawImage(im,(w-iw)/2+c.panX*extraX,(h-ih)/2+c.panY*extraY,iw,ih);
+  ctx.lineWidth=Math.max(2,w/220);ctx.strokeStyle='rgba(255,255,255,.70)';
+  if(c.kind==='avatar'){
+    ctx.beginPath();ctx.arc(w/2,h/2,w/2-3,0,2*Math.PI);ctx.stroke();
+  }else{ctx.strokeRect(3,3,w-6,h-6);}
+  const label=document.getElementById('cw-crop-zoom-label');if(label)label.textContent=Math.round(c.zoom*100)+'%';
+}
+function cwCropCompact(){
+  // Exporta só os pixels da foto: as guias desenhadas na prévia não entram na imagem final.
+  const c=cwActiveCrop,preview=document.getElementById('cw-crop-canvas');
+  const limits=PROFILE_IMAGE_LIMITS[c.kind];
+  let w=preview.width,h=preview.height;
+  for(let i=0;i<9;i++){
+    const out=document.createElement('canvas');out.width=w;out.height=h;
+    const ctx=out.getContext('2d');
+    const scale=Math.max(w/c.image.naturalWidth,h/c.image.naturalHeight)*c.zoom;
+    const iw=c.image.naturalWidth*scale,ih=c.image.naturalHeight*scale;
+    const extraX=Math.max(0,(iw-w)/2),extraY=Math.max(0,(ih-h)/2);
+    ctx.fillStyle='#170f1d';ctx.fillRect(0,0,w,h);
+    ctx.drawImage(c.image,(w-iw)/2+c.panX*extraX,(h-ih)/2+c.panY*extraY,iw,ih);
+    const data=canvasToCompactDataURL(out,[.83,.74,.65,.55][Math.min(i,3)]);
+    if(data.length<=limits.maxChars)return data;
+    w=Math.max(1,Math.round(w*.84));h=Math.max(1,Math.round(h*.84));
+  }
+  throw new Error('O recorte ficou grande demais. Tente outra imagem.');
+}
+function cwOpenImageCrop(file,isBanner){
+  return new Promise(async(resolve,reject)=>{
+    try{
+      const image=await loadLocalImage(file);
+      if(!image.naturalWidth||!image.naturalHeight)throw new Error('Imagem inválida.');
+      const canvas=document.getElementById('cw-crop-canvas'),modal=document.getElementById('cw-image-crop-modal');
+      const kind=isBanner?'banner':'avatar';
+      canvas.width=kind==='banner'?900:400;canvas.height=kind==='banner'?300:400;
+      cwActiveCrop={image,kind,zoom:1,panX:0,panY:0,resolve,reject};
+      document.getElementById('cw-crop-title').textContent=isBanner?'Enquadrar banner':'Enquadrar foto de perfil';
+      document.getElementById('cw-crop-zoom').value='1';
+      modal.classList.remove('hidden');cwCropPaint();
+    }catch(e){reject(e);}
+  });
+}
+function cwFinishCrop(save){
+  if(!cwActiveCrop)return;
+  const c=cwActiveCrop;
+  try{const result=save?cwCropCompact():null;c.resolve(result);}
+  catch(e){c.reject(e);}
+  finally{cwActiveCrop=null;document.getElementById('cw-image-crop-modal')?.classList.add('hidden');}
+}
+function cwSetupCropUI(){
+  const canvas=document.getElementById('cw-crop-canvas');if(!canvas||canvas.dataset.ready)return;
+  canvas.dataset.ready='1';
+  document.getElementById('cw-crop-cancel').onclick=()=>cwFinishCrop(false);
+  document.getElementById('cw-crop-close').onclick=()=>cwFinishCrop(false);
+  document.getElementById('cw-crop-apply').onclick=()=>cwFinishCrop(true);
+  document.getElementById('cw-crop-zoom').addEventListener('input',e=>{if(cwActiveCrop){cwActiveCrop.zoom=Number(e.target.value);cwCropPaint();}});
+  let prev=null;
+  canvas.addEventListener('pointerdown',e=>{
+    if(!cwActiveCrop)return;e.preventDefault();prev={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!prev||!cwActiveCrop)return;
+    const c=cwActiveCrop,rect=canvas.getBoundingClientRect();
+    if(c.extraX>.01)c.panX=Math.max(-1,Math.min(1,c.panX+(e.clientX-prev.x)*canvas.width/rect.width/c.extraX));
+    if(c.extraY>.01)c.panY=Math.max(-1,Math.min(1,c.panY+(e.clientY-prev.y)*canvas.height/rect.height/c.extraY));
+    prev={x:e.clientX,y:e.clientY};cwCropPaint();
+  });
+  canvas.addEventListener('pointerup',()=>prev=null);
+  canvas.addEventListener('pointercancel',()=>prev=null);
+  document.getElementById('cw-image-crop-modal').addEventListener('click',e=>{if(e.target.id==='cw-image-crop-modal')cwFinishCrop(false);});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cwActiveCrop)cwFinishCrop(false);});
+}
 function setupUpload(areaId,inputId,previewId,setVal,isBanner){
   const area=document.getElementById(areaId);
   const input=document.getElementById(inputId);
@@ -3284,7 +3616,17 @@ function setupUpload(areaId,inputId,previewId,setVal,isBanner){
     area.style.pointerEvents="none";
     area.setAttribute("aria-busy","true");
     try{
-      const dataUrl=await readMediaFile(file,label);
+      let dataUrl;
+      const isGif=file.type==='image/gif'||/\.gif$/i.test(file.name);
+      if(isGif){
+        dataUrl=await readMediaFile(file,label);
+        showToast('GIF animado mantido sem recorte. Para editar, escolha JPG, PNG ou WebP.');
+      }else{
+        if(file.size>20*1024*1024)throw new Error('Imagem acima de 20 MB. Escolha uma menor.');
+        cwSetupCropUI();
+        dataUrl=await cwOpenImageCrop(file,isBanner);
+      }
+      if(!dataUrl)return;
       setVal(dataUrl);
       if(preview){
         preview.onload=null;
@@ -3717,7 +4059,7 @@ async function handleEditProfile(e){
     if(selectedMode==='url' && !data.profileAppearance.musicUrl)
       throw new Error('Informe uma URL HTTPS direta para um arquivo de áudio.');
     if(selectedMode==='file' && !cwPendingAudioFile && userProfile?.profileAppearance?.musicMode!=='file')
-      throw new Error('Selecione um arquivo de áudio de até 500 KB antes de salvar.');
+      throw new Error('Selecione um arquivo e toque em Preparar trecho antes de salvar.');
 
     // O Firestore limita cada documento a 1 MiB; os limites de imagem acima
     // deixam margem para os demais dados do perfil e links.
@@ -3758,7 +4100,7 @@ async function handleEditProfile(e){
     if(/larger than|1.?048.?576|document.*size|exceeds.*size/i.test(raw)){
       errEl.textContent="O perfil ultrapassou o limite de tamanho do Firestore. Reduza a foto ou o banner e tente novamente.";
     }else if(code==="permission-denied" || /insufficient permissions/i.test(raw)){
-      errEl.textContent="O Firebase recusou a alteração. Publique as regras da Alpha 0.9.4, incluindo profileAppearance e profile_audio.";
+      errEl.textContent="O Firebase recusou a alteração. Publique as regras da Alpha 0.9.4.1, incluindo musicCover e profile_audio.";
     }else if(code==="unavailable" || /network|offline/i.test(raw)){
       errEl.textContent="Sem conexão estável com o Firebase. Confira a internet e tente novamente.";
     }else{
@@ -5090,12 +5432,17 @@ function openBadgeEditor(uid,publicData){
 
 // ALTERE ESTE OBJETO A CADA NOVA VERSÃO. A página Avisos e o selo do logo usam a mesma fonte.
 const CATWEB_RELEASE = Object.freeze({
-  version: "Alpha 0.9.4",
+  version: "Alpha 0.9.4.1",
   date: "4 de novembro de 2026",
   isoDate: "2026-11-04",
-  title: "Ecos da Identidade",
-  description: "Organize seu espaço pessoal com blocos, frase, status, favoritos, música e novos detalhes visuais. O editor ficou mais amplo no PC, preservando o celular.",
+  title: "Estúdio dos Fragmentos",
+  description: "Seu perfil agora tem capa para a música, editor de trechos com forma de onda e corte de fotos e banners. Tudo preparado no aparelho e adaptado ao celular.",
   changes: [
+    "Capa personalizada para a música, enviada do aparelho e compactada sem Storage.",
+    "Editor de áudio com seleção de início e fim, forma de onda e prévia do trecho.",
+    "Trecho final de até 15 segundos e 500 KB, codificado em WAV mono antes do envio.",
+    "Editor para recortar, arrastar e dar zoom em avatar e banner antes de salvar.",
+    "Recorte e edição adaptados ao celular; GIFs pequenos continuam sem recorte para preservar a animação.",
     "Editor de perfil em duas colunas no computador, mantendo o layout compacto no celular.",
     "Blocos do perfil com ordem e visibilidade personalizáveis.",
     "Frase de destaque, status pessoal e lista de cinco favoritos.",
@@ -5108,6 +5455,7 @@ const CATWEB_RELEASE = Object.freeze({
     "Perfil público sincronizado com o privado no mesmo lote e e-mail exibido apenas nas configurações."
   ],
   history: [
+    {version:"Alpha 0.9.4.1",date:"04/11/2026",summary:"Estúdio dos Fragmentos: capa musical, recorte de áudio, foto e banner."},
     {version:"Alpha 0.9.4",date:"04/11/2026",summary:"Ecos da Identidade: blocos, música, favoritos, status e editor ampliado."},
     {version:"Alpha 0.9.3",date:"04/11/2026",summary:"Identidades da Noite: fundo da página, temas, cores, molduras e interesses."},
     {version:"Alpha 0.9.2.5",date:"17/10/2026",summary:"Feed compacto, salvos como no X, chat mais legível e menu mobile simplificado."},
