@@ -1375,6 +1375,69 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
  .user-area .btn-logout{font-size:.67rem;padding:5px 6px}
 }
 
+
+/* ===== CatWeb Alpha 0.9.3 — Identidades da Noite ===== */
+#view-perfil.cw-profile-scene,#view-user.cw-profile-scene{
+  position:relative;isolation:isolate;min-height:calc(100vh - 160px);overflow:hidden;
+  --cw-wall-gradient:linear-gradient(135deg,#211523 0%,#493047 46%,#17101e 100%);
+  --cw-wall-image:none;--cw-wall-position:center;--cw-wall-overlay:.36;
+  --cw-profile-accent:#ae789c;--cw-profile-font:var(--font-body);
+}
+#view-perfil.cw-profile-scene::before,#view-user.cw-profile-scene::before{
+  content:"";position:absolute;inset:-24px;z-index:-2;pointer-events:none;
+  background-image:var(--cw-wall-image),var(--cw-wall-gradient);
+  background-size:cover,cover;background-position:center var(--cw-wall-position),center;
+  background-repeat:no-repeat;filter:blur(7px);transform:scale(1.025);
+}
+#view-perfil.cw-profile-scene::after,#view-user.cw-profile-scene::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,5,12,.20),rgba(8,5,12,var(--cw-wall-overlay)) 45%,rgba(8,5,12,.72));
+}
+#view-perfil.cw-profile-scene>.container,#view-user.cw-profile-scene>.container{position:relative;z-index:1;max-width:1260px}
+.cw-profile-scene .profile-card{--accent:var(--cw-profile-accent);width:100%;max-width:none;margin:0;min-width:0}
+.cw-profile-scene .profile-name{font-family:var(--cw-profile-font)}
+.cw-profile-scene .profile-bio{font-family:var(--cw-profile-font)}
+.cw-profile-scene .profile-handle,.cw-profile-scene .bio-mention{color:var(--cw-profile-accent)}
+.cw-profile-scene .profile-avatar{border-color:rgba(255,248,241,.85)}
+.cw-profile-scene[data-cw-frame="gold"] .profile-avatar{border-color:#d9b87a;box-shadow:0 0 0 3px rgba(217,184,122,.20),0 12px 26px rgba(0,0,0,.24)}
+.cw-profile-scene[data-cw-frame="moon"] .profile-avatar{border-color:#d9c0ee;box-shadow:0 0 0 4px rgba(197,162,228,.28),0 0 24px rgba(187,155,228,.35)}
+.cw-profile-scene[data-cw-frame="none"] .profile-avatar{border-color:transparent;box-shadow:none}
+.cw-profile-scene[data-cw-card="glass"] .profile-card{background:rgba(18,13,25,.67)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:rgba(228,192,215,.3)}
+.cw-profile-scene[data-cw-card="outline"] .profile-card{border:2px solid var(--cw-profile-accent);box-shadow:0 0 0 5px rgba(0,0,0,.1),0 18px 38px rgba(0,0,0,.24)}
+[data-theme="light"] .cw-profile-scene[data-cw-card="glass"] .profile-card{background:rgba(249,243,249,.83)!important}
+.cw-interests{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 12px}
+.cw-interests:empty{display:none}
+.cw-interest{border-radius:999px;border:1px solid rgba(204,177,198,.28);background:rgba(164,114,157,.11);padding:5px 10px;font:600 .73rem var(--font-ui);color:var(--ink);max-width:100%;overflow-wrap:anywhere}
+.cw-profile-scene .cw-interest{border-color:var(--cw-profile-accent)}
+.cw-profile-intro{font:500 .68rem/1.3 var(--font-ui);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 12px}
+.cw-appearance-editor{margin:17px 0 21px;padding:17px;border:1px solid var(--border);border-radius:18px;background:rgba(146,103,151,.06)}
+.cw-appearance-editor h3{font:600 1.42rem var(--font-display);margin:0 0 6px;color:var(--ink)}
+.cw-appearance-editor p{font:.78rem/1.55 var(--font-ui);color:var(--muted);margin:0 0 13px}
+.cw-theme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:14px}
+.cw-theme-choice{cursor:pointer;padding:8px;text-align:left;background:var(--card);border:2px solid var(--border);color:var(--ink);border-radius:12px;min-width:0;font:.78rem var(--font-ui)}
+.cw-theme-choice[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px rgba(166,111,158,.22)}
+.cw-theme-swatch{display:block;height:54px;border-radius:8px;margin-bottom:6px}
+.cw-appearance-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cw-appearance-fields label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font:600 .78rem var(--font-ui)}
+.cw-appearance-fields input:not([type="color"]),.cw-appearance-fields select{background:var(--paper);color:var(--ink);border:1px solid var(--border);border-radius:10px;min-width:0;width:100%;padding:10px;font: .84rem var(--font-ui)}
+.cw-appearance-fields input[type="color"]{width:100%;height:42px;padding:3px;border:1px solid var(--border);border-radius:10px;background:var(--paper)}
+.cw-appearance-fields input[type="range"]{width:100%;accent-color:var(--accent)}
+.cw-appearance-fields .cw-field-wide{grid-column:1/-1}
+.cw-appearance-preview{position:relative;overflow:hidden;min-height:154px;border-radius:14px;background:#27182f;margin:12px 0 14px;padding:20px 16px;display:flex;align-items:center;justify-content:center}
+.cw-preview-card{max-width:290px;width:100%;padding:17px;border:1px solid rgba(255,255,255,.28);border-radius:15px;color:#fff;background:rgba(23,14,30,.78);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+.cw-preview-card strong{font-size:1.17rem;display:block;margin:0 0 4px}.cw-preview-card small{color:#e9d3e3;font:.75rem var(--font-ui)}
+.cw-preview-palette{height:4px;border-radius:10px;width:55px;margin:11px 0 0}
+.cw-preview-caption{display:block;margin-top:6px;font:.7rem var(--font-ui);color:var(--muted)}
+.cw-appearance-reset{width:100%;margin-top:8px}
+@media(min-width:900px){
+ #view-perfil #profile-content,#view-user>.container{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,670px);align-items:start;justify-content:center;gap:24px}
+ #view-perfil .profile-timeline,#view-user .profile-timeline{max-width:none;width:100%;margin:0;min-width:0}
+ #view-perfil #own-profile-card,#view-user #public-profile{position:sticky;top:105px;min-width:0}
+}
+@media(max-width:899px){#view-perfil.cw-profile-scene>.container,#view-user.cw-profile-scene>.container{max-width:680px}.cw-profile-scene .profile-card{max-width:600px;margin:0 auto}}
+@media(max-width:520px){.cw-appearance-editor{padding:12px}.cw-appearance-fields{grid-template-columns:1fr}.cw-profile-scene .profile-card{border-radius:22px}}
+@media(prefers-reduced-motion:reduce){.cw-theme-choice{transition:none}}
+
 </style>
 </head>
 <body>
@@ -1720,6 +1783,7 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
               <div class="profile-id" id="profile-id-el"></div>
               <div class="profile-email" id="profile-email-el"></div>
               <div class="profile-bio" id="profile-bio-el">Sem bio ainda.</div>
+              <div class="cw-interests" id="profile-interests-el" aria-label="Interesses"></div>
               <div class="profile-links" id="profile-links-el"></div>
               <div class="profile-stats">
                 <button type="button" class="stat-link" id="stat-friends-button"><strong id="stat-friends">0</strong> <span>amigos</span></button>
@@ -1733,7 +1797,7 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
                 <div id="my-friends-pagination" class="friends-pagination"></div>
               </div>
               <div class="profile-actions">
-                <button class="btn btn-primary btn-sm" id="btn-edit-profile">✧ Editar perfil</button>
+                <button class="btn btn-primary btn-sm" id="btn-edit-profile">✧ Editar perfil e aparência</button>
                 <a href="#config" class="btn btn-secondary btn-sm">✣ Configurações</a>
               </div>
             </div>
@@ -1759,6 +1823,7 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
         <div id="config-content" class="hidden">
           <div class="settings-card">
             <h2>Privacidade</h2>
+            <p class="form-hint" id="cw-private-email-note">Seu e-mail de login só aparece aqui, para você.</p>
             <div class="settings-row">
               <div>
                 <strong>Ocultar lista de amigos</strong>
@@ -1858,6 +1923,46 @@ body:has(#view-chat.active) #mobile-compose-fab,body:not(:has(#view-feed.active)
           </div>
           <div class="form-hint">O banner é salvo no perfil junto dos outros dados. Imagens estáticas são redimensionadas automaticamente.</div>
         </div>
+
+        <section class="cw-appearance-editor" aria-label="Personalizar aparência do perfil">
+          <h3>✦ Identidades da Noite</h3>
+          <p>Personalize o fundo atrás do seu perfil. A capa que já fica acima do avatar continua independente. Os fundos por URL são carregados diretamente do site externo, sem Firebase Storage.</p>
+          <div class="cw-theme-grid" id="cw-theme-choices" aria-label="Temas para o perfil"></div>
+          <div class="cw-appearance-fields">
+            <label>Tipo de fundo
+              <select id="cw-appearance-mode"><option value="gradient">Tema com gradiente</option><option value="image">Imagem por URL HTTPS</option></select>
+            </label>
+            <label>Cor de destaque
+              <input type="color" id="cw-appearance-accent" value="#ae789c">
+            </label>
+            <label class="cw-field-wide" id="cw-wallpaper-url-row">Endereço da imagem de fundo (HTTPS)
+              <input type="url" id="cw-appearance-url" maxlength="400" placeholder="https://exemplo.com/fundo.jpg" autocomplete="off" inputmode="url">
+            </label>
+            <label>Estilo do cartão
+              <select id="cw-appearance-card"><option value="solid">Clássico</option><option value="glass">Vidro escuro</option><option value="outline">Borda destacada</option></select>
+            </label>
+            <label>Fonte do perfil
+              <select id="cw-appearance-font"><option value="classic">Clássica</option><option value="elegant">Elegante</option><option value="modern">Moderna</option></select>
+            </label>
+            <label>Moldura do avatar
+              <select id="cw-appearance-frame"><option value="classic">Clássica</option><option value="gold">Dourada</option><option value="moon">Lunar</option><option value="none">Sem moldura</option></select>
+            </label>
+            <label>Posição da imagem
+              <select id="cw-appearance-position"><option value="center">Centro</option><option value="top">Topo</option><option value="bottom">Parte inferior</option></select>
+            </label>
+            <label class="cw-field-wide">Escurecimento do fundo: <span id="cw-appearance-overlay-label">36%</span>
+              <input type="range" id="cw-appearance-overlay" min="0" max="85" step="5" value="36">
+            </label>
+            <label class="cw-field-wide">Meus interesses (até 6, separados por vírgulas)
+              <input type="text" id="cw-appearance-interests" maxlength="180" placeholder="Anime, Música, RPG, Arte...">
+            </label>
+          </div>
+          <div class="cw-appearance-preview" id="cw-appearance-preview" aria-label="Prévia do tema">
+            <div class="cw-preview-card" id="cw-preview-card"><strong id="cw-preview-name">Seu perfil</strong><small>✦ Um pequeno universo no CatWeb</small><div class="cw-preview-palette" id="cw-preview-palette"></div></div>
+          </div>
+          <span class="cw-preview-caption">Prévia em tempo real · A imagem externa só carrega quando você usar a URL.</span>
+          <button type="button" class="btn btn-secondary btn-sm cw-appearance-reset" id="cw-appearance-reset">Restaurar tema padrão</button>
+        </section>
         <div class="form-error hidden" id="ep-error"></div>
         <button type="submit" class="btn btn-primary btn-full" id="ep-save">Salvar</button>
       </form>
@@ -2444,6 +2549,126 @@ function ensureArrays(p){
 }
 
 
+
+// CatWeb Alpha 0.9.3: estilos decorativos do perfil (dados pequenos, sem upload).
+const CW_APPEARANCE_THEMES=Object.freeze({
+  nocturne:{name:"Nocturne",accent:"#ae789c",gradient:"linear-gradient(135deg,#19101e 0%,#54324a 55%,#1a1224 100%)"},
+  mare:{name:"Maré Lunar",accent:"#8dbacf",gradient:"linear-gradient(135deg,#101b29 0%,#295069 56%,#181b35 100%)"},
+  biblioteca:{name:"Biblioteca Antiga",accent:"#d6ad74",gradient:"linear-gradient(135deg,#1e1813 0%,#6c4b34 52%,#261d1b 100%)"},
+  aurora:{name:"Aurora Escarlate",accent:"#db8b9d",gradient:"linear-gradient(135deg,#1d101a 0%,#713248 56%,#281323 100%)"}
+});
+const CW_APPEARANCE_DEFAULT=Object.freeze({theme:"nocturne",backgroundMode:"gradient",backgroundUrl:"",accent:"#ae789c",card:"solid",font:"classic",frame:"classic",overlay:35,position:"center",interests:""});
+const CW_FONTS=Object.freeze({classic:'var(--font-body)',elegant:'"Cormorant Garamond",Georgia,serif',modern:'var(--font-ui)'});
+function cwSafeWallpaper(url){
+  const raw=String(url||"").trim();if(!raw)return "";
+  if(raw.length>400 || /["'\\<>\s]/.test(raw))return "";
+  try{const u=new URL(raw);return u.protocol==='https:'&&!u.username&&!u.password&&u.href.length<=400?u.href:"";}catch{return "";}
+}
+function cwNormalizeAppearance(value){
+  const a=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+  const theme=CW_APPEARANCE_THEMES[a.theme]?a.theme:'nocturne';
+  const from=(key,allowed,def)=>allowed.includes(a[key])?a[key]:def;
+  return {
+    theme,
+    backgroundMode:from('backgroundMode',['gradient','image'],'gradient'),
+    backgroundUrl:cwSafeWallpaper(a.backgroundUrl),
+    accent:typeof a.accent==='string'&&/^#[0-9a-fA-F]{6}$/.test(a.accent)?a.accent:CW_APPEARANCE_THEMES[theme].accent,
+    card:from('card',['solid','glass','outline'],'solid'),
+    font:from('font',['classic','elegant','modern'],'classic'),
+    frame:from('frame',['classic','gold','moon','none'],'classic'),
+    overlay:Number.isInteger(a.overlay)&&a.overlay>=0&&a.overlay<=85?a.overlay:35,
+    position:from('position',['center','top','bottom'],'center'),
+    interests:typeof a.interests==='string'?a.interests.slice(0,180):''
+  };
+}
+function cwProfileInterests(container,appearance){
+  if(!container)return;container.replaceChildren();
+  const seen=new Set();const val=cwNormalizeAppearance(appearance).interests;
+  val.split(',').map(x=>x.trim().slice(0,25)).filter(Boolean).forEach(x=>{
+    if(seen.size>=6||seen.has(x.toLowerCase()))return;seen.add(x.toLowerCase());
+    const label=document.createElement('span');label.className='cw-interest';label.textContent=x;container.appendChild(label);
+  });
+}
+function cwApplyAppearance(viewId,value){
+  const view=document.getElementById(viewId);if(!view)return;
+  const a=cwNormalizeAppearance(value),t=CW_APPEARANCE_THEMES[a.theme];
+  const url=a.backgroundMode==='image'?cwSafeWallpaper(a.backgroundUrl):'';
+  // CSS custom properties on a single profile view: never affect another user's page.
+  view.classList.add('cw-profile-scene');view.dataset.cwCard=a.card;view.dataset.cwFrame=a.frame;
+  view.style.setProperty('--cw-profile-accent',a.accent);
+  view.style.setProperty('--cw-profile-font',CW_FONTS[a.font]);
+  view.style.setProperty('--cw-wall-gradient',t.gradient);
+  view.style.setProperty('--cw-wall-image',url?`url("${url}")`:'none');
+  view.style.setProperty('--cw-wall-position',a.position);
+  view.style.setProperty('--cw-wall-overlay',String(a.overlay/100));
+}
+function cwResetAppearance(viewId){cwApplyAppearance(viewId,CW_APPEARANCE_DEFAULT);}
+function cwDrawAppearancePreview(){
+  const input=document.getElementById('cw-appearance-mode');if(!input)return;
+  const a=cwReadAppearanceForm(false);const t=CW_APPEARANCE_THEMES[a.theme];
+  const preview=document.getElementById('cw-appearance-preview');const card=document.getElementById('cw-preview-card');
+  if(preview){const url=a.backgroundMode==='image'?cwSafeWallpaper(a.backgroundUrl):'';
+    preview.style.backgroundImage=`linear-gradient(rgba(9,5,14,${Math.min(.92,a.overlay/100+.13)}),rgba(9,5,14,.45))${url?`,url("${url}")`:''},${t.gradient}`;
+    preview.style.backgroundSize='cover';preview.style.backgroundPosition='center '+a.position;
+  }
+  if(card){card.style.background=a.card==='glass'?'rgba(24,14,30,.57)':a.card==='outline'?'rgba(24,14,30,.93)':'rgba(24,14,30,.84)';
+    card.style.borderColor=a.card==='outline'?a.accent:'rgba(255,255,255,.24)';
+    card.style.fontFamily=CW_FONTS[a.font];}
+  const palette=document.getElementById('cw-preview-palette');if(palette)palette.style.background=a.accent;
+  const label=document.getElementById('cw-appearance-overlay-label');if(label)label.textContent=a.overlay+'%';
+  const urlRow=document.getElementById('cw-wallpaper-url-row');if(urlRow)urlRow.classList.toggle('hidden',a.backgroundMode!=='image');
+  document.querySelectorAll('#cw-theme-choices [data-cw-theme]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.cwTheme===a.theme)));
+}
+let cwCurrentTheme='nocturne';
+function cwReadAppearanceForm(strict=true){
+  const mode=document.getElementById('cw-appearance-mode')?.value||'gradient';
+  const raw=document.getElementById('cw-appearance-url')?.value.trim()||'';
+  const u=cwSafeWallpaper(raw);
+  if(strict&&mode==='image'&&!u)throw new Error('Informe uma URL HTTPS válida para o fundo, com até 400 caracteres.');
+  return cwNormalizeAppearance({
+    theme:cwCurrentTheme,backgroundMode:mode,backgroundUrl:u,
+    accent:document.getElementById('cw-appearance-accent')?.value,
+    card:document.getElementById('cw-appearance-card')?.value,
+    font:document.getElementById('cw-appearance-font')?.value,
+    frame:document.getElementById('cw-appearance-frame')?.value,
+    overlay:Number(document.getElementById('cw-appearance-overlay')?.value||35),
+    position:document.getElementById('cw-appearance-position')?.value,
+    interests:document.getElementById('cw-appearance-interests')?.value||''
+  });
+}
+function cwSetAppearanceForm(value){
+  const a=cwNormalizeAppearance(value);cwCurrentTheme=a.theme;
+  for(const [id,val] of [
+    ['cw-appearance-mode',a.backgroundMode],['cw-appearance-url',a.backgroundUrl],
+    ['cw-appearance-accent',a.accent],['cw-appearance-card',a.card],
+    ['cw-appearance-font',a.font],['cw-appearance-frame',a.frame],
+    ['cw-appearance-overlay',a.overlay],['cw-appearance-position',a.position],
+    ['cw-appearance-interests',a.interests]]){
+    const el=document.getElementById(id);if(el)el.value=val;
+  }
+  const name=document.getElementById('cw-preview-name');if(name)name.textContent=document.getElementById('ep-name')?.value||'Seu perfil';
+  cwDrawAppearancePreview();
+}
+function cwInitAppearanceEditor(){
+  const choices=document.getElementById('cw-theme-choices');if(!choices||choices.dataset.ready)return;
+  choices.dataset.ready='1';
+  for(const [id,t] of Object.entries(CW_APPEARANCE_THEMES)){
+    const btn=document.createElement('button');btn.type='button';btn.className='cw-theme-choice';btn.dataset.cwTheme=id;btn.setAttribute('aria-pressed','false');
+    const swatch=document.createElement('span');swatch.className='cw-theme-swatch';swatch.style.background=t.gradient;
+    const txt=document.createElement('span');txt.textContent=t.name;btn.append(swatch,txt);
+    btn.addEventListener('click',()=>{cwCurrentTheme=id;const color=document.getElementById('cw-appearance-accent');if(color)color.value=t.accent;cwDrawAppearancePreview();});choices.appendChild(btn);
+  }
+  document.querySelectorAll('#edit-profile-modal [id^="cw-appearance-"]').forEach(el=>{
+    if(['INPUT','SELECT'].includes(el.tagName)){
+      el.addEventListener('input',cwDrawAppearancePreview);el.addEventListener('change',cwDrawAppearancePreview);
+    }
+  });
+  document.getElementById('ep-name')?.addEventListener('input',()=>{
+    const name=document.getElementById('cw-preview-name');if(name)name.textContent=document.getElementById('ep-name').value||'Seu perfil';
+  });
+  document.getElementById('cw-appearance-reset')?.addEventListener('click',()=>cwSetAppearanceForm(CW_APPEARANCE_DEFAULT));
+}
+
 // Perfil público separado dos campos privados (e-mail, bloqueios, amizades ocultas).
 function publicProfileData(p){
   const d=p||{};
@@ -2460,7 +2685,8 @@ function publicProfileData(p){
     friends:d.hideFriends?[]:(Array.isArray(d.friends)?d.friends.slice(0,500):[]),
     followersCount:Number(d.followersCount)||0,
     followingCount:Array.isArray(d.following)?d.following.length:0,
-    badges:Array.isArray(d.badges)?d.badges.filter(k=>BADGE_LIBRARY[k] && !["creator","moderator"].includes(k)).slice(0,7):[]
+    badges:Array.isArray(d.badges)?d.badges.filter(k=>BADGE_LIBRARY[k] && !["creator","moderator"].includes(k)).slice(0,7):[],
+    ...(d.profileAppearance?{profileAppearance:cwNormalizeAppearance(d.profileAppearance)}:{})
   };
   return data;
 }
@@ -2794,6 +3020,7 @@ function renderProfile(){
   const guest=document.getElementById("profile-guest");
   const content=document.getElementById("profile-content");
   if(!currentUser){
+    cwResetAppearance("view-perfil");
     guest?.classList.remove("hidden"); content?.classList.add("hidden"); return;
   }
   guest?.classList.add("hidden"); content?.classList.remove("hidden");
@@ -2808,8 +3035,10 @@ function renderProfile(){
   }
   document.getElementById("profile-handle-el").textContent=atHandle(p);
   document.getElementById("profile-id-el").textContent=p.accountId?("ID: "+p.accountId):"";
-  document.getElementById("profile-email-el").textContent=currentUser.email||"";
+  document.getElementById("profile-email-el").textContent=""; // E-mail somente nas configurações privadas.
   renderBioInto(document.getElementById("profile-bio-el"), p.bio||"");
+  cwApplyAppearance("view-perfil",p.profileAppearance);
+  cwProfileInterests(document.getElementById("profile-interests-el"),p.profileAppearance);
   renderProfileLinks(document.getElementById("profile-links-el"), p.links);
   document.getElementById("stat-friends").textContent=String((p.friends||[]).length);
   document.getElementById("stat-followers").textContent=String(p.followersCount||0);
@@ -2971,6 +3200,7 @@ async function unfollowUser(uid){
 async function renderPublicProfile(uid){
   const el=document.getElementById("public-profile");
   if(!el) return;
+  cwResetAppearance("view-user");
   el.innerHTML=`<div class="placeholder-card"><p>Carregando perfil...</p></div>`;
   try{
     const snap=await db.collection("public_profiles").doc(uid).get();
@@ -3050,6 +3280,7 @@ async function renderPublicProfile(uid){
           <div class="profile-handle">${esc(atHandle(d))}</div>
           <div class="profile-id">ID: ${esc(d.accountId||"—")}</div>
           <div class="profile-bio" id="pub-bio-el"></div>
+          <div class="cw-interests" id="pub-interests-el" aria-label="Interesses"></div>
           <div class="profile-links" id="pub-links-el"></div>
           <div class="profile-stats">
             <button type="button" class="stat-link" id="pub-stat-friends"><strong>${friendsCount}</strong> <span>amigos</span></button>
@@ -3066,6 +3297,8 @@ async function renderPublicProfile(uid){
           ${isOwner()&&!isSelf?`<div id="cw-badges-editor" class="cw-badges-editor hidden" aria-label="Gerenciar insígnias"></div>`:""}
         </div>
       </div>`;
+    cwApplyAppearance("view-user",d.profileAppearance);
+    cwProfileInterests(document.getElementById("pub-interests-el"),d.profileAppearance);
     renderProfileActivity(uid,"public-profile-activity",false);
     if(!d.bannerURL){
       const b=document.getElementById("pub-banner");
@@ -3116,6 +3349,8 @@ function renderConfig(){
   ensureArrays(userProfile);
   document.getElementById("config-id-label").textContent=userProfile.accountId||"—";
   document.getElementById("config-at-label").textContent=atHandle(userProfile);
+  const privateEmail=document.getElementById("cw-private-email-note");
+  if(privateEmail)privateEmail.textContent="E-mail da conta (privado): "+(currentUser.email||"—");
   const tog=document.getElementById("toggle-hide-friends");
   if(tog){
     tog.classList.toggle("on", !!userProfile.hideFriends);
@@ -3156,6 +3391,8 @@ function openEditProfile(){
   const ap=document.getElementById("ep-avatar-preview"), bp=document.getElementById("ep-banner-preview");
   if(pendingAvatar){ ap.src=pendingAvatar; ap.classList.remove("hidden"); } else ap.classList.add("hidden");
   if(pendingBanner){ bp.src=pendingBanner; bp.classList.remove("hidden"); } else bp.classList.add("hidden");
+  cwInitAppearanceEditor();
+  cwSetAppearanceForm(userProfile.profileAppearance);
   document.getElementById("edit-profile-modal").classList.remove("hidden");
 }
 
@@ -3175,7 +3412,8 @@ async function handleEditProfile(e){
       bio,
       photoURL:pendingAvatar||null,
       bannerURL:pendingBanner||null,
-      links
+      links,
+      profileAppearance:cwReadAppearanceForm(true)
     });
 
     // O Firestore limita cada documento a 1 MiB; os limites de imagem acima
@@ -3185,10 +3423,14 @@ async function handleEditProfile(e){
       throw new Error("O perfil ficou grande demais para o Firestore. Escolha uma imagem menor para foto ou banner.");
     }
 
-    await db.collection("users").doc(currentUser.uid).set(data,{merge:true});
-    await currentUser.updateProfile({displayName:name});
-    userProfile={...userProfile,...data};
-    await syncPublicProfile();
+    // Atualização atômica: o tema privado e o público precisam coincidir pelas Rules.
+    const nextProfile={...userProfile,...data};
+    const batch=db.batch();
+    batch.set(db.collection("users").doc(currentUser.uid),data,{merge:true});
+    batch.set(db.collection("public_profiles").doc(currentUser.uid),publicProfileData(nextProfile),{merge:true});
+    await batch.commit();
+    userProfile=nextProfile;
+    try{await currentUser.updateProfile({displayName:name});}catch(authErr){console.warn("Nome Auth não sincronizado; o perfil Firestore foi salvo.",authErr);}
     // role permanece o que veio do servidor / Auth
     if(isOwner()) userProfile.role="owner";
     else if(isModerator()) userProfile.role="moderator";
@@ -3201,7 +3443,7 @@ async function handleEditProfile(e){
     if(/larger than|1.?048.?576|document.*size|exceeds.*size/i.test(raw)){
       errEl.textContent="O perfil ultrapassou o limite de tamanho do Firestore. Reduza a foto ou o banner e tente novamente.";
     }else if(code==="permission-denied" || /insufficient permissions/i.test(raw)){
-      errEl.textContent="O Firebase recusou a alteração. Confira se as regras de /users permitem atualizar displayName, bio, photoURL, bannerURL e links.";
+      errEl.textContent="O Firebase recusou a alteração. Publique as regras da Alpha 0.9.3, incluindo o campo profileAppearance.";
     }else if(code==="unavailable" || /network|offline/i.test(raw)){
       errEl.textContent="Sem conexão estável com o Firebase. Confira a internet e tente novamente.";
     }else{
@@ -4533,19 +4775,20 @@ function openBadgeEditor(uid,publicData){
 
 // ALTERE ESTE OBJETO A CADA NOVA VERSÃO. A página Avisos e o selo do logo usam a mesma fonte.
 const CATWEB_RELEASE = Object.freeze({
-  version: "Alpha 0.9.2.5",
-  date: "17 de outubro de 2026",
-  isoDate: "2026-10-17",
-  title: "Sussurros da Noite — Polimento",
-  description: "Melhoramos o visual do chat e do feed para deixar o CatWeb mais limpo, organizado e fácil de usar no celular. Os controles de moderação agora ficam separados da navegação comum.",
+  version: "Alpha 0.9.3",
+  date: "4 de novembro de 2026",
+  isoDate: "2026-11-04",
+  title: "Identidades da Noite",
+  description: "Agora o perfil é um espaço pessoal: escolha fundos, temas, cores, molduras e interesses. As imagens em posts e chats continuam adiadas.",
   changes: [
-    "Ações dos posts reduzidas a ícones, com marcador de Salvos no padrão do X.",
-    "Mensagens com balões mais legíveis; responder, reagir e opções aparecem ao abrir o menu ⋯.",
-    "Denúncia indisponível nas próprias mensagens, comentários e publicações.",
-    "Menu sanduíche mobile enxuto, sem repetir a barra inferior e sem a aba Teste.",
-    "Botão de moderação fica sob a conta de Creator/Moderator; acesso continua protegido."
+    "Fundo da página de perfil independente da imagem de capa, com URL HTTPS ou gradiente.",
+    "Quatro temas: Nocturne, Maré Lunar, Biblioteca Antiga e Aurora Escarlate.",
+    "Editor com prévia ao vivo, cor de destaque, cartão, fonte, moldura e restauração do padrão.",
+    "Interesses pessoais visíveis no perfil, sem depender do Firebase Storage.",
+    "Perfil público sincronizado com o privado no mesmo lote e e-mail exibido apenas nas configurações."
   ],
   history: [
+    {version:"Alpha 0.9.3",date:"04/11/2026",summary:"Identidades da Noite: fundo da página, temas, cores, molduras e interesses."},
     {version:"Alpha 0.9.2.5",date:"17/10/2026",summary:"Feed compacto, salvos como no X, chat mais legível e menu mobile simplificado."},
     {version:"Alpha 0.9.2.4",date:"17/10/2026",summary:"Chat com respostas específicas, reações, separadores e busca."},
     {version:"Alpha 0.9.2.3",date:"17/10/2026",summary:"Gerenciamento manual e protegido das insígnias pelo Creator."},
